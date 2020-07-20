@@ -1,0 +1,314 @@
+---
+title: "Introduction to package 'precautionary'"
+author: "David C. Norris"
+date: "7/16/2020"
+output: bookdown::tufte_html2
+vignette: <
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Introduction to package 'precautionary'}
+  \usepackage[utf8]{inputenc}
+bibliography: precautionary-package.bib
+---
+
+```{r setup, include=FALSE}
+old <- options(rmarkdown.html_vignette.check_title = FALSE) # suppress un-needed warning
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.height = 4, fig.width = 6)
+
+library(precautionary)
+library(knitr)
+library(kableExtra)
+
+options(ordinalizer = NULL) # vignette presumes this is not already set
+
+# Echo source focused on package functionality by redacting calls to kable()
+# see https://bookdown.org/yihui/rmarkdown-cookbook/hook-hide.html:
+local({
+  hook_source <- knitr::knit_hooks$get('source')
+  knitr::knit_hooks$set(source = function(x, options) {
+    x <- gsub(" -> etc.", "", x)
+    x <- x[!grepl("^etc. %>%", x)] # strip lines starting "etc. %>% ..."
+    x <- x[!grepl("\\(etc.,", x)]  # strip lines with fun(etc., ...)
+    hook_source(x, options)
+  })
+})
+```
+
+# Basics
+
+In package [escalation](https://CRAN.R-project.org/package=escalation), you can simulate a 3 + 3 design as follows:
+
+```{r basic-sim}
+library(escalation)
+# Design a 3 + 3 trial, with 5 pre-specified doses to escalate through
+design <- get_three_plus_three(num_doses = 5)
+# Posit a scenario where these 5 doses cause dose-limiting toxicities
+# (DLTs) in 12%, 27%, etc. of the population:
+scenario <- c(0.12, 0.27, 0.44, 0.53, 0.57)
+design %>% simulate_trials( # Feed the design to the simulator ...
+  num_sims = 100            # run 100 simulated trials
+, true_prob_tox = scenario  # under the chosen scenario,
+) -> sims                   # and store the results.
+
+summary(sims) -> etc. # summarize simulation results
+etc. %>%
+  kable(caption="Simulation summary as produced by package `escalation`.")
+```
+
+From Table \@ref(tab:basic-sim), we learn a few things of interest. For example, we see that, with the lowest dose being too toxic for 12% of the population, under this scenario there is a real chance even this dose will be rejected by our trial. Conversely, we also find it is not impossible for our trial to recommend a dose that is toxic to nearly half the population. Note also that, by summing the $n$ column, we can estimate expected enrollment at `r sum(round(summary(sims)$n, digits=2))`, which perhaps informs us about the expected cost or duration of our trial.^[Any complete simulation study will of course consider multiple scenarios, perhaps weighted according to their varying likelihood.]
+
+But simulations such as these cannot answer crucial questions about **trial safety**, mainly because the simulation machinery recognizes no notion of *graded toxicity*. The binary (yes/no) toxicities in the simulation machinery of `escalation` regard Grade 5 (fatal) toxicities no differently from Grade 3. 
+
+## Introducing realistic pharmacologic thinking
+
+The `precautionary` package solves this problem by pursuing a *realistic* approach to pharmacologic thinking. Rather than plucking a sequence of toxicity probabilities out of thin air, this approach **derives** such probabilities according to how a latent toxicity threshold is distributed in the population.
+
+```{r}
+library(precautionary)
+mtdi_dist <- mtdi_lognormal(CV = 2          # coefficient of variation
+                           ,median = 5      # median DLT threshold
+                           ,units = "mg/kg" # real doses have units!
+                           )
+```
+
+Likewise, the pre-specified doses for our dose-escalation design must be specified as actual doses. With package `precautionary`, this is accomplished by setting a `dose_levels` option:
+
+```{r}
+options(dose_levels = c(0.5, 1, 2, 4, 6)) # specify actual dosing
+```
+
+A plot of the MTD$_i$ distribution makes clear the connection with toxicity probabilities:
+
+```{r}
+plot(mtdi_dist)
+```
+
+```{r}
+probs <- mtdi_dist@dist$cdf(getOption('dose_levels'))
+names(probs) <- paste(getOption('dose_levels'), mtdi_dist@units)
+t(probs) %>% kable(digits = 4)
+```
+
+## Extending `escalation` to support the MTD$_i$ concept
+
+Package `precautionary` provides additional methods for `escalation` functions, so that an `mtdi_distribution` may be used instead of out-of-thin-air probabilities:
+
+```{r MTDi-regime}
+design %>% simulate_trials(
+  num_sims = 100
+, true_prob_tox = mtdi_dist # pull tox probs from a MODEL, not thin air
+) -> SIMS
+
+summary(SIMS) -> etc.
+etc. %>% kable(caption = "A simulation summary under the MTD$_i$ regime of package `precautionary`.")
+```
+```{r , echo=FALSE}
+
+```
+
+Judging from Table \@ref(tab:MTDi-regime), however, introducing the MTD$_i$ concept has by itself generated little progress. The only apparent improvement compared with Table \@ref(tab:basic-sim) is the addition of a column with *actual* doses. To make further progress *while continuing to operate within the dose-escalation paradigm*, we need to introduce another concept.
+
+## Introducing graded toxicities
+
+When its full implications are allowed to develop, the latent toxicity threshold MTD$_i$ has far-reaching consequences for the design of dose-finding trials. Indeed, it forms the conceptual basis for dose-*titration* designs that abandon cohortwise dose-escalation altogether [@norris_dose_2017; @norris_precautionary_2017].
+
+For present purposes, however, we take it for granted that (for whatever reason) we have chosen to employ a dose-escalation design. That choice effectively discards the core insight of MTD$_i$, and relegates the MTD$_i$ concept *standing alone* to the status of a mere formalism. But in conjunction with *a dose scaling that links different toxicity grades at the individual level*, the MTD$_i$ can be rehabilitated as an effective tool, even within the confines of a dose-escalation design. In package `precautionary`, such scaling functions are called 'ordinalizers', and may be applied at the time when simulations are summarized:
+
+```{r}
+tox_threshold_scaling <- function(MTDi, r0) {
+  MTDi * r0 ^ c(Gr1=-2, Gr2=-1, Gr3=0, Gr4=1, Gr5=2)
+}
+summary(SIMS
+       ,ordinalizer = tox_threshold_scaling
+       ,r0 = 2      # supply a value for ordinalizer's r0 parameter
+       )$safety %>% # select the 'safety' component of the summary
+  kable() %>% add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+```
+
+Clearly, we have now made some genuine progress. Of special interest from a safety perspective are the numbers of Grade 4 (severe) and Grade 5 (fatal) toxicities expected in the trial.
+
+## A closer look at the *ordinalizer*
+
+Let us unroll the ordinalizer above, to make it less cryptic:
+
+```{r, eval=FALSE}
+tox_threshold_scaling <-
+  function(MTDi   # An ordinalizer is a function of a dose threshold,
+          ,r0 = 2 # and in general has additional parameters as well.
+          ) {
+    # An ordinalizer assumes we start with a binary toxicity notion,
+    # and maps that to a *graded* notion of toxicity by means of a
+    # transformation in 'dose-space'.
+    # Assuming the default value r0 = 2 provided in its definition,
+    # this ordinalizer says that an individual whose dose threshold
+    # for the binary toxicity is MTDi has thresholds ...
+    c(Gr1 = MTDi / r0^2 # at MTDi/4 for Gr1,
+     ,Gr2 = MTDi / r0   # at MTDi/2 for Gr2,
+     ,Gr3 = MTDi        # at MTDi for Gr3 ('tox' is defined as Gr3+),
+     ,Gr4 = MTDi * r0   # at 2*MTDi for Gr4,
+     ,Gr5 = MTDi * r0^2 # at 4*MTDi for Gr5.
+    )
+  }
+```
+
+In general, an ordinalizer returns a named vector^[The names allow for user-customized labeling of the toxicity levels, which carries forward into summaries, etc.] that links the different dose thresholds at which an individual will experience each grade of toxicity. In [@norris_retrospective_2020], these concepts are laid out in terms of MTD$_i^g$ with the index $g$ running over toxicity grades:
+
+$$
+\mathrm{MTD}_i^g, g \in \{1,...,5\},
+$$
+
+and defined as the dose threshold where a grade-$(g-1)$ toxicity would convert to grade-$g$.^[To preserve the intuition of the term 'maximum tolerated dose', you could say MTD$_i^g$ is the maximum dose that individual $i$ can tolerate if 'tolerability' is defined as toxicity *below* grade-$g$.] Thus, in the usual case where the binary 'dose-limiting toxicity' (DLT) of a dose-escalation design is defined as CTCAE Grade ≥ 3, we identify 'MTD$_i$' with MTD$_i^3$ .
+
+## Taking stock of parameter counts
+
+It might seem that the benefits of package `precautionary` come at the cost of having to pre-specify many additional parameters. *Au contraire!* In the example above, the `CV` and `median` parameters of `mtdi_dist` **replaced** the 5 'true toxicity probabilities' that the package-`escalation` approach requires you to pluck out of thin air. Thus, immediately we have save 3 parameters. From this savings, we then spent only 1 on the single parameter `r0` of our simple ordinalizer. Indeed, if we had wished to spend all of our 'parameter savings', we could have specified an ordinalizer such as:^[Note the judicious allocation of parameters. This ordinalizer devotes 2 parameters (`r4` and `r5`) to the safety-critical threshold ratios $r_4 := \mathrm{MTD}_i^3 : \mathrm{MTD}_i^4$ and $r_5 := \mathrm{MTD}_i^3 : \mathrm{MTD}_i^4$, but conserves on parameters by sharing the same parameter $r_{12}$ for the ratios involving low-grade toxicities.]
+
+```{r, eval=FALSE}
+function(MTDi3, r12, r4, r5) {
+  c(Gr1 = MTDi3 / r12^2
+   ,Gr2 = MTDi3 / r12
+   ,Gr3 = MTDi3
+   ,Gr4 = MTDi3 * r4
+   ,Gr5 = MTDi3 * r4*r5
+   )
+}
+```
+
+As we count design parameters, we also ought not overlook the pre-specified dose levels themselves, which are indeed parameters of our design. But package `prcautionary` changes the manner in which these parameters enter into simulation-based trial design. In the usual approach, every new set of pre-specified dose levels requires its own set of 'true toxicity probabilities' to be pulled anew out of thin air. But in package `precautionary`, the linkage between dose levels and probabilities is provided through a model. In theory, this would allow us to obtain our dose levels as *results* of simulation-based design, instead of providing them as *inputs*.
+
+# Modeling uncertainty
+
+When you ask people to start thinking, sometimes they keep going. No sooner will you have elicited values for the `CV` and `median` parametrizing a lognormal MTD$_i$ distribution
+
+$$
+\begin{align}
+\log \mathrm{MTD}_i &\sim \mathscr{N}(\mu, \sigma^2)
+\\
+\mu &\equiv \log(\mathrm{median})
+\\
+\sigma^2 &\equiv \log (1+\mathrm{CV}^2),
+\end{align}
+$$
+
+than you will hear about the uncertainty in these values themselves. You can model this uncertainty by introducing *hyperparameters* $\sigma_{\mathrm{CV}}$ and $\sigma_{\mathrm{med}}$:
+
+$$
+\begin{align}
+\mu &\sim \mathscr{N}(\log \mathrm{median}, \sigma_{\mathrm{med}}^2)
+\\
+\mathrm{CV} &\sim \mathscr{R}(\sigma_{\mathrm{CV}})
+\end{align}
+$$
+
+Here, $\sigma_{\mathrm{med}}$ expresses *in relative terms*^[For example, setting $\sigma_{\mathrm{med}} = 0.5$ would express a ±50% uncertainty in our guessed median MTD$_i$.] our uncertainty about the median of MTD$_i$, while $\sigma_{\mathrm{CV}}$ is the parameter of the [Raleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution):
+
+```{r Raleigh-distribution, echo=FALSE, message=FALSE}
+# Plot the Raleigh density for a suitable range of sigma_CV values
+library(distr6)
+sigmas <- c(0.1, 0.25, 0.5, 1)
+curves <- as.data.table(expand.grid(x = seq(0, 2, 0.01)
+                                   ,mode = sigmas
+                                   )
+                        )
+curves[, pdf := Rayleigh$new(mode = mode)$pdf(x), by = mode]
+plot(pdf ~ x, data = curves[mode == sigmas[1]], type = 'l'
+     , main = "Probability density function of the Rayleigh distribution")
+for(sigma in sigmas[-1])
+  lines(pdf ~ x, data = curves[mode == sigma])
+text(x=0.3, y=5, expression(sigma == 0.1))
+text(x=0.5, y=2.25, expression(sigma == 0.25))
+text(x=0.75, y=1.4, expression(sigma == 0.5))
+text(x=1.5, y=0.9, expression(sigma == 1))
+```
+
+Happily, the Raleigh distribution's $\sigma$ parameter coincides with its mode, and its standard deviation is about $\frac{2}{3} \sigma$, which seems a reasonable degree of relative uncertainty about CV(MTD$_i$).^[The exact figure is $\sqrt{1-\pi/2} \approx 0.655$. Given how little is known generally---or even acknowledged!---about inter-individual variation in optimal dosing, it seems reasonable to suppose that you will allow a ± of 66% on any value you choose as most likely for $\mathrm{CV}(\mathrm{MTD}_i)$.] We take advantage of this when we implement these features in package `precautionary`, avoiding the need to ask users to specify a separate uncertainty parameter for CV:
+
+```{r hyperprior, fig.cap="Multiple samples from a *hyperprior* over the distribution of MTD$_i$. Consider the implications for the customary practice of pulling 'true toxicity probabilities' out of thin air!"}
+mtdi_gen <- hyper_mtdi_lognormal(CV = 1
+                                ,median_mtd = 5
+                                ,median_sdlog = 0.5 # this is new
+                                ,units="mg/kg"
+                                )
+plot(mtdi_gen, K=100, col=adjustcolor("red", alpha=0.25))
+```
+
+```{r dang}
+design %>% simulate_trials(
+  # Note 'num_sims' is now a vector of 2 numbers, reflecting the
+  # *multilevel* nature of simulations from a hyper_mtdi_distribution:
+  num_sims = c(20 # How many trials to simulate per hyperprior draw
+              ,20 # How many samples to draw from hyperprior
+              )
+, true_prob_tox = mtdi_gen # pull tox probs from MANY models
+) -> HYPERSIMS
+
+# As a convenience, package 'precautionary' lets you set the
+# ordinalizer as an *option* so that you don't have to keep
+# specifying it as an argument to summary(). By providing a
+# default setting for the r0 parameter in the ordinalizer
+# definition, we avoid having to keep specifying that, too.
+options(ordinalizer = function(MTDi, r0 = 1.5) {
+  MTDi * r0 ^ c(Gr1=-2, Gr2=-1, Gr3=0, Gr4=1, Gr5=2)
+})
+
+summary(HYPERSIMS)$safety -> etc.
+etc. %>% kable() %>%
+  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+```
+
+## Uncertainty about the ordinalizer
+
+What about our uncertainty over the parameter $r_0$? Here, it seems entirely reasonable simply to explore a range of values:
+
+```{r}
+r0 <- c(1.25, 1.5, 1.75, 2.0)
+rbind(summary(HYPERSIMS, r0=r0[1])$safety
+     ,summary(HYPERSIMS, r0=r0[2])$safety
+     ,summary(HYPERSIMS, r0=r0[3])$safety
+     ,summary(HYPERSIMS, r0=r0[4])$safety
+     ) -> safety
+cbind(data.table(`$r_0$` = r0), safety) %>% kable() %>%
+  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+```
+
+# Beyond 3 + 3
+
+One reason that package `escalation` makes such a suitable basis for these developments is that it unifies several dose-escalation designs under one object-oriented design. Thus, we can repeat the above simulation exercise with a CRM design:
+
+```{r hyper-CRM}
+crm_design <- get_dfcrm(skeleton = scenario, target = 0.25) %>%
+  stop_at_n(n = 24)
+crm_design %>% simulate_trials(
+  num_sims = 20 # interpreted as convenient shorthand for c(20,20)
+, true_prob_tox = mtdi_gen
+) -> CRM_HYPERSIMS
+
+summary(CRM_HYPERSIMS)$safety -> etc.
+etc. %>% kable() %>%
+  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+```
+
+The BOIN design of [@liu_bayesian_2015] is also supported:
+
+```{r hyper-BOIN}
+boin_design <- get_boin(num_doses = 5, target = 0.25) %>%
+  stop_at_n(n = 24)
+boin_design %>% simulate_trials(
+  num_sims = 20
+, true_prob_tox = mtdi_gen
+) -> BOIN_HYPERSIMS
+
+summary(BOIN_HYPERSIMS)$safety -> etc.
+etc. %>% kable() %>%
+  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+```
+
+# Implications of package `precautionary`
+
+Package `precautionary` demonstrates in principle that any dose-escalation design can be assessed for safety, given a modicum of realistic pharmacologic thinking. prior elicitation. How truly modest this additional input is, should be apparent from the obvious connections between the ratios in an 'ordinalizer' and the notion of [therapeutic index](https://en.wikipedia.org/wiki/Therapeutic_index) (TI). It is hard to imagine that any trialist would pursue a phase 1 investigation without some notion of a plausible range for TI. Yet within the biostatistical literature on dose-finding methods, I know of no attempt to apply a TI concept formally to assess design safety.
+
+```{r echo=FALSE, results='hide'}
+options(old) # restore user's original options before finishing, per CRAN
+```
+
+# References
