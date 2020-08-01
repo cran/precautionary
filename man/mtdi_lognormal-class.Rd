@@ -11,6 +11,7 @@ A lognormal MTDi distribution
 \section{Slots}{
 
 \describe{
-\item{\code{dist}}{An object of class \code{distr6::Lognormal}}
+\item{\code{dist}}{A list with \code{cdf}, \code{quantile} and \code{name} components
+intended to provide that portion of the interface of \code{distr6::Lognormal}.}
 }}
 

@@ -7,14 +7,20 @@
 \title{Hyperprior for lognormal MTDi distributions}
 \description{
 This hyperprior generates lognormal MTDi distributions with their
-coefficient of variation being drawn from a Rayleigh distribution
-with mode parameter \code{CV}. Because the standard deviation of
-this distribution is
-}
-\details{
-this implicitly link our uncertainty about \code{CV} to its value.
+coefficients of variation being drawn from a Rayleigh distribution
+with mode parameter set to
+\deqn{\sigma := CV.}
+Because the standard deviation of this distribution is
+\deqn{sd = \sigma \sqrt{(2 - \pi/2)} \approx 0.655 \sigma,}{%
+       sd = \sigma \sqrt(2 - \pi/2) ~ 0.655 \sigma,}
+this conveniently links our uncertainty about \code{CV} to its \emph{mode},
+and indeed to other measures of centrality that are proportional to this:
+\deqn{mean = \sigma \sqrt{\pi/2} \approx 1.25 \sigma}{%
+       mean = \sigma \sqrt(\pi/2) ~ 1.25 \sigma}
 
-The medians of the lognormal distributions generated are themselves
+\deqn{median = \sigma \sqrt{2 log(2)} \approx 1.18 \sigma.}{%
+       median = \sigma \sqrt(2 log(2)) ~ 1.18 \sigma.}
+The \emph{medians} of the lognormal distributions generated are themselves
 drawn from a lognormal distribution with \code{meanlog = log(median_mtd)}
 and \code{sdlog = median_sdlog}. Thus, parameter \code{median_sdlog}
 represents a proportional uncertainty in \code{median_mtd}.

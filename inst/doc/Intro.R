@@ -75,7 +75,7 @@ summary(SIMS
        ,ordinalizer = tox_threshold_scaling
        ,r0 = 2      # supply a value for ordinalizer's r0 parameter
        )$safety %>% # select the 'safety' component of the summary
-  kable() %>% add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+  safety_kable()
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  tox_threshold_scaling <-
@@ -108,13 +108,12 @@ summary(SIMS
 
 ## ----Raleigh-distribution, echo=FALSE, message=FALSE--------------------------
 # Plot the Raleigh density for a suitable range of sigma_CV values
-library(distr6)
 sigmas <- c(0.1, 0.25, 0.5, 1)
 curves <- as.data.table(expand.grid(x = seq(0, 2, 0.01)
                                    ,mode = sigmas
                                    )
                         )
-curves[, pdf := Rayleigh$new(mode = mode)$pdf(x), by = mode]
+curves[, pdf := 2*(x/mode^2)*dchisq((x/mode)^2, df=2), by = mode]
 plot(pdf ~ x, data = curves[mode == sigmas[1]], type = 'l'
      , main = "Probability density function of the Rayleigh distribution")
 for(sigma in sigmas[-1])
@@ -130,15 +129,11 @@ mtdi_gen <- hyper_mtdi_lognormal(CV = 1
                                 ,median_sdlog = 0.5 # this is new
                                 ,units="mg/kg"
                                 )
-plot(mtdi_gen, K=100, col=adjustcolor("red", alpha=0.25))
+plot(mtdi_gen, n=100, col=adjustcolor("red", alpha=0.25))
 
 ## ----dang---------------------------------------------------------------------
 design %>% simulate_trials(
-  # Note 'num_sims' is now a vector of 2 numbers, reflecting the
-  # *multilevel* nature of simulations from a hyper_mtdi_distribution:
-  num_sims = c(20 # How many trials to simulate per hyperprior draw
-              ,20 # How many samples to draw from hyperprior
-              )
+  num_sims = 400
 , true_prob_tox = mtdi_gen # pull tox probs from MANY models
 ) -> HYPERSIMS
 
@@ -152,42 +147,39 @@ options(ordinalizer = function(MTDi, r0 = 1.5) {
 })
 
 summary(HYPERSIMS)$safety -> etc.
-etc. %>% kable() %>%
-  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+etc. %>% safety_kable()
 
 ## -----------------------------------------------------------------------------
 r0 <- c(1.25, 1.5, 1.75, 2.0)
-rbind(summary(HYPERSIMS, r0=r0[1])$safety
-     ,summary(HYPERSIMS, r0=r0[2])$safety
-     ,summary(HYPERSIMS, r0=r0[3])$safety
-     ,summary(HYPERSIMS, r0=r0[4])$safety
+rbind(summary(HYPERSIMS, r0=r0[1])$safety[1,]
+     ,summary(HYPERSIMS, r0=r0[2])$safety[1,]
+     ,summary(HYPERSIMS, r0=r0[3])$safety[1,]
+     ,summary(HYPERSIMS, r0=r0[4])$safety[1,]
      ) -> safety
-cbind(data.table(`$r_0$` = r0), safety) %>% kable() %>%
-  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+cbind(data.table(`$r_0$` = r0), safety) %>% kable(digits=2) %>%
+  add_header_above(c(" "=1, "Expected counts by toxicity grade"=6, " "=1))
 
 ## ----hyper-CRM----------------------------------------------------------------
 crm_design <- get_dfcrm(skeleton = scenario, target = 0.25) %>%
   stop_at_n(n = 24)
 crm_design %>% simulate_trials(
-  num_sims = 20 # interpreted as convenient shorthand for c(20,20)
+  num_sims = 200
 , true_prob_tox = mtdi_gen
 ) -> CRM_HYPERSIMS
 
 summary(CRM_HYPERSIMS)$safety -> etc.
-etc. %>% kable() %>%
-  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+etc. %>% safety_kable()
 
 ## ----hyper-BOIN---------------------------------------------------------------
 boin_design <- get_boin(num_doses = 5, target = 0.25) %>%
   stop_at_n(n = 24)
 boin_design %>% simulate_trials(
-  num_sims = 20
+  num_sims = 200
 , true_prob_tox = mtdi_gen
 ) -> BOIN_HYPERSIMS
 
 summary(BOIN_HYPERSIMS)$safety -> etc.
-etc. %>% kable() %>%
-  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+etc. %>% safety_kable()
 
 ## ----echo=FALSE, results='hide'-----------------------------------------------
 options(old) # restore user's original options before finishing, per CRAN

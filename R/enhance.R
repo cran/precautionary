@@ -290,18 +290,6 @@ as.data.table.precautionary <- function(x, keep.rownames = FALSE
                      ,function(.) .[[1]]$fit$outcomes
                      )
   ensemble <- rbindlist(lapply(x$fits, extractor), idcol = "rep")
-  # Go 'straight to dose-space' by generating MTDi,g columns
-  if( is(x,"hyper") ){ # TODO: Consider handling this via 'as.data.table.hyper'
-    K <- length(x$hyper$mtdi_samples)
-    M <- max(ensemble$rep)/K  # so now K*M is nrow(ensemble)
-    k <- MTDi <- NULL # avert spurious R CMD check "no visible binding" NOTEs
-    ensemble[, k := 1 + (rep-1) %/% M]
-    ensemble[, rep := 1 + (rep-1) %% M]
-    setcolorder(ensemble,c("k","rep")) # so key .(k,rep) is on far left
-    ensemble[, MTDi := x$hyper$mtdi_samples[[k]]@dist$quantile(u_i), by = k]
-  } else {
-    ensemble[, MTDi := x$mtdi_dist@dist$quantile(ensemble$u_i)]
-  }
   if( is.null(ordinalizer) )
     return(ensemble)
   # TODO: Do add these columns to 'ensemble', so that the whole table
@@ -338,8 +326,8 @@ as.data.table.precautionary <- function(x, keep.rownames = FALSE
 #' @param ordinalizer An ordinalizer function
 #' @param ... Additional parameters passed to the ordinalizer
 #'
-#' @importFrom dplyr rename rename_with mutate select everything
-#' @importFrom stats xtabs
+#' @importFrom dplyr mutate rename_with select everything
+#' @importFrom stats xtabs addmargins sd var
 #' @importFrom rlang .data
 #' @export
 summary.precautionary <- function(object, ordinalizer = getOption('ordinalizer'), ...) {
@@ -354,15 +342,93 @@ summary.precautionary <- function(object, ordinalizer = getOption('ordinalizer')
   ensemble <- as.data.table(object, ordinalizer = ordinalizer, ...)
   if( !is.null(ordinalizer) ){
     summary <- list(escalation = summary, safety = NULL)
-    K <- c(nrow(object$hyper$true_prob_tox), 1)[1] # NB: c(NULL,1) = c(1)
-    expectation <- colMeans(xtabs(~ rep + Tox, data=ensemble))/K
-    expectation <- c(expectation, Total = sum(expectation))
-    expectation <- t(as.matrix(expectation))
-    rownames(expectation) <- "Expected participants"
-    summary$safety <- expectation
+    toxTab <- xtabs(~ rep + Tox, data=ensemble) %>%
+      addmargins(margin = 2, FUN = list(Total=sum))
+    expectation <- rbind("Expected participants" = colMeans(toxTab)
+                        ,"MCSE" = apply(toxTab, MARGIN = 2, FUN = sd) / sqrt(nrow(toxTab))
+                        )
+    summary$safety <- prependClass("safetytab", expectation)
+    summary$toxTab <- toxTab # (for DEBUGGING purposes)
   }
   summary
 }
+
+#' Format a phase 1 trial safety tabulation to show significant digits only
+#'
+#' The essential insight of package [precautionary] is distilled into the
+#' \emph{safety tabulation} which it generates from trial simulations, reporting
+#' the expected number of patients who will experience each grade of toxicity.
+#' To render this table for easy interpretation, these expectations are simply
+#' displayed with a number of significant digits appropriate to their Monte Carlo
+#' standard errors (MCSEs). 
+#'
+#' @param x A safety tabulation as found in the \code{safety} component of the
+#'  list returned by [summary.precautionary].
+#'
+#' @param ... Unused; included for compatibility with generic signature
+#'
+#' @note The MCSEs of safety tabulations remain available for inspection
+#'  (see example), but are omitted from standard displays because they may lend
+#'  themselves to misinterpretation as \emph{confidence bounds} on the number
+#'  of patients who will experience each toxicity grade \emph{in any given trial}.
+#'
+#' @examples 
+#' mtdi_gen <- hyper_mtdi_lognormal(CV = 1
+#'                                 ,median_mtd = 5
+#'                                 ,median_sdlog = 0.5
+#'                                 ,units="mg/kg")
+#' ordinalizer <- function(MTDi, r0 = 1.5)
+#'   MTDi * r0 ^ c(Gr1=-2, Gr2=-1, Gr3=0, Gr4=1, Gr5=2)
+#' old <- options(dose_levels = c(0.5, 1, 2, 4, 6)
+#'               ,ordinalizer = ordinalizer)
+#' get_boin(num_doses = 5, target = 0.25) %>%
+#'   stop_at_n(n = 24) %>%
+#'   simulate_trials(
+#'     num_sims = 80
+#'   , true_prob_tox = mtdi_gen) -> boin_hsims
+#' safety <- summary(boin_hsims)$safety
+#' safety # The print method invokes 'format.safetytab' ..
+#' # .. but we can also inspect the underlying matrix by indexing:
+#' safety[,]  # indexing strips 'safetytab' class, returning plain matrix
+#' # Note that, by extend()ing the simulation we can increase precision:
+#' if (interactive()) { # may run a bit too long for CRAN servers' taste
+#'   boin_hsims %>% extend(target_mcse = 0.1) -> boin_hsimsX 
+#'   summary(boin_hsimsX)$safety
+#' }
+#' options(old)
+#' @export
+format.safetytab <- function(x, ...){
+  sigtenths <- x['MCSE',] < 0.1
+  mapply(function(x, d) format(round(x, digits=d), nsmall=d), x[1,], 0+sigtenths)
+}
+
+#' @importFrom stringr str_pad
+#' @export
+print.safetytab <- function(x, ...) {
+  fx <- format(x, ...)
+  width <- 2 + nchar(names(fx))
+  writeLines(paste(str_pad(names(fx), width=width, "left"), collapse=""))
+  writeLines(paste(str_pad(unname(fx), width=width, "left"), collapse=""))
+  invisible(x)
+}
+
+#' Output a \code{kable} for a simulation summary of class \code{safetytab}
+#'
+#' @param safetytab An object of S3 class \code{safetytab}
+#'
+#' @param ... Additional parameters passed to [knitr::kable]
+#'
+#' @importFrom knitr kable
+#' @importFrom kableExtra kable_styling add_header_above
+#' @export
+safety_kable <- function(safetytab, ...) {
+  safetytab %>% format() %>% t() %>%
+    kable(align='r', ...) %>% kable_styling(position = "left", full_width = FALSE) %>%
+    add_header_above(c("Expected counts per toxicity grade"=6, " "=1))
+}
+
+#' @export
+t.safetytab <- function(x) t(x[,]) # plain-matrix transpose (drops 'safetytab' class)
 
 #' @importFrom escalation num_doses
 num_doses.three_plus_three_selector_factory <- function(x, ...) {

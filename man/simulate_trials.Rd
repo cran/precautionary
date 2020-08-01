@@ -16,7 +16,7 @@ simulate_trials(selector_factory, num_sims, true_prob_tox, ...)
 \arguments{
 \item{selector_factory}{An object of S3 class \code{selector_factory}}
 
-\item{num_sims}{A vector of simulation dimensions}
+\item{num_sims}{Number of simulations to run}
 
 \item{true_prob_tox}{A generator of toxicity distributions}
 
@@ -25,14 +25,21 @@ simulate_trials(selector_factory, num_sims, true_prob_tox, ...)
 \description{
 Simulate trials defined via package \code{escalation}
 }
+\details{
+If invoked interactively with \code{num_sims} > 10, then a
+\code{txtProgressBar} is displayed in the console. The condition on
+\code{num_sims} has the useful side effect of allowing this function
+to be invoked iteratively by \link{extend} (with \code{num_sims} = 10)
+without the nuisance of nested progress bars.
+}
 \examples{
 old <- options(dose_levels = c(0.5, 1, 2, 4, 6, 8))
 mtdi_gen <- hyper_mtdi_lognormal(CV = 1
                                  , median_mtd = 6, median_sdlog = 0.5
                                  , units="mg/kg")
 num_sims <- ifelse(interactive()
-, c(15, 20)
-, c( 3,  5) # avoid taxing CRAN servers
+, 300
+, 15 # avoid taxing CRAN servers
 )
 hsims <- get_three_plus_three(num_doses = 6) \%>\%
   simulate_trials(
@@ -42,6 +49,10 @@ summary(hsims, ordinalizer=NULL) # vanilla summary with binary toxicity
 summary(hsims, ordinalizer = function(dose, r0 = sqrt(2))
   c(Gr1=dose/r0^2, Gr2=dose/r0, Gr3=dose, Gr4=dose*r0, Gr5=dose*r0^2)
 )
+hsims <- hsims \%>\% extend(num_sims = num_sims)
+summary(hsims, ordinalizer = function(dose, r0 = sqrt(2))
+  c(Gr1=dose/r0^2, Gr2=dose/r0, Gr3=dose, Gr4=dose*r0, Gr5=dose*r0^2)
+)$safety
 # Set a CRM skeleton from the average probs in above simulation
 num_sims <- ifelse(interactive()
 , 16
@@ -88,5 +99,12 @@ summary(crm_sims
 , ordinalizer = function(MTDi, r0 = sqrt(2))
     MTDi * r0^c(Gr1=-2, Gr2=-1, Gr3=0, Gr4=1, Gr5=2)
 )
+if (interactive()) { # don't overtax CRAN servers
+crm_sims <- crm_sims \%>\% extend(target_mcse = 0.1)
+summary(crm_sims
+, ordinalizer = function(MTDi, r0 = sqrt(2))
+    MTDi * r0^c(Gr1=-2, Gr2=-1, Gr3=0, Gr4=1, Gr5=2)
+)$safety
+}
 options(old)
 }

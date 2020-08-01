@@ -2,23 +2,23 @@
 % Please edit documentation in R/toxicity_generators.R
 \name{plot,mtdi_generator-method}
 \alias{plot,mtdi_generator-method}
-\title{Visualize K samples from an \code{mtdi_generator} object}
+\title{Visualize n samples from an \code{mtdi_generator} object}
 \usage{
-\S4method{plot}{mtdi_generator}(x, y = NULL, K = 20, col = "gray", ...)
+\S4method{plot}{mtdi_generator}(x, y = NULL, n = 20, col = "gray", ...)
 }
 \arguments{
 \item{x}{An \code{mtdi_generator} object}
 
 \item{y}{Included for compatibility with generic signature}
 
-\item{K}{Number of samples to draw from hyperprior for visualization}
+\item{n}{Number of samples to draw from hyperprior for visualization}
 
 \item{col}{Color of lines used to depict samples}
 
 \item{\dots}{Additional arguments passed onward to \code{plot}}
 }
 \description{
-Visualize K samples from an \code{mtdi_generator} object
+Visualize n samples from an \code{mtdi_generator} object
 }
 \examples{
 if (interactive()) {
@@ -26,6 +26,6 @@ mtdi_gen <- hyper_mtdi_lognormal(CV = 1
                                 ,median_mtd = 5
                                 ,median_sdlog = 0.5
                                 ,units="mg/kg")
-plot(mtdi_gen, K=100, col=adjustcolor("red", alpha=0.5))
+plot(mtdi_gen, n=100, col=adjustcolor("red", alpha=0.5))
 } 
 }

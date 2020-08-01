@@ -1,7 +1,7 @@
 ---
 title: "Introduction to package 'precautionary'"
 author: "David C. Norris"
-date: "7/16/2020"
+date: "7/31/2020"
 output: bookdown::tufte_html2
 vignette: <
   %\VignetteEngine{knitr::rmarkdown}
@@ -122,7 +122,7 @@ summary(SIMS
        ,ordinalizer = tox_threshold_scaling
        ,r0 = 2      # supply a value for ordinalizer's r0 parameter
        )$safety %>% # select the 'safety' component of the summary
-  kable() %>% add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+  safety_kable()
 ```
 
 Clearly, we have now made some genuine progress. Of special interest from a safety perspective are the numbers of Grade 4 (severe) and Grade 5 (fatal) toxicities expected in the trial.
@@ -204,13 +204,12 @@ Here, $\sigma_{\mathrm{med}}$ expresses *in relative terms*^[For example, settin
 
 ```{r Raleigh-distribution, echo=FALSE, message=FALSE}
 # Plot the Raleigh density for a suitable range of sigma_CV values
-library(distr6)
 sigmas <- c(0.1, 0.25, 0.5, 1)
 curves <- as.data.table(expand.grid(x = seq(0, 2, 0.01)
                                    ,mode = sigmas
                                    )
                         )
-curves[, pdf := Rayleigh$new(mode = mode)$pdf(x), by = mode]
+curves[, pdf := 2*(x/mode^2)*dchisq((x/mode)^2, df=2), by = mode]
 plot(pdf ~ x, data = curves[mode == sigmas[1]], type = 'l'
      , main = "Probability density function of the Rayleigh distribution")
 for(sigma in sigmas[-1])
@@ -221,7 +220,7 @@ text(x=0.75, y=1.4, expression(sigma == 0.5))
 text(x=1.5, y=0.9, expression(sigma == 1))
 ```
 
-Happily, the Raleigh distribution's $\sigma$ parameter coincides with its mode, and its standard deviation is about $\frac{2}{3} \sigma$, which seems a reasonable degree of relative uncertainty about CV(MTD$_i$).^[The exact figure is $\sqrt{1-\pi/2} \approx 0.655$. Given how little is known generally---or even acknowledged!---about inter-individual variation in optimal dosing, it seems reasonable to suppose that you will allow a ± of 66% on any value you choose as most likely for $\mathrm{CV}(\mathrm{MTD}_i)$.] We take advantage of this when we implement these features in package `precautionary`, avoiding the need to ask users to specify a separate uncertainty parameter for CV:
+Happily, the Raleigh distribution's $\sigma$ parameter coincides with its *mode* (likeliest value), and its standard deviation is about $\frac{2}{3} \sigma$, which seems a reasonable degree of relative uncertainty about CV(MTD$_i$).^[The exact figure is $\sqrt{2-\pi/2} \approx 0.655$. Given how little is known generally---or even acknowledged!---about inter-individual variation in optimal dosing, it seems reasonable to suppose that you will allow a ± of 66% on any value you choose as most likely for $\mathrm{CV}(\mathrm{MTD}_i)$.] We take advantage of this when we implement these features in package `precautionary`, avoiding the need to ask users to specify a separate uncertainty parameter for CV:
 
 ```{r hyperprior, fig.cap="Multiple samples from a *hyperprior* over the distribution of MTD$_i$. Consider the implications for the customary practice of pulling 'true toxicity probabilities' out of thin air!"}
 mtdi_gen <- hyper_mtdi_lognormal(CV = 1
@@ -229,16 +228,12 @@ mtdi_gen <- hyper_mtdi_lognormal(CV = 1
                                 ,median_sdlog = 0.5 # this is new
                                 ,units="mg/kg"
                                 )
-plot(mtdi_gen, K=100, col=adjustcolor("red", alpha=0.25))
+plot(mtdi_gen, n=100, col=adjustcolor("red", alpha=0.25))
 ```
 
 ```{r dang}
 design %>% simulate_trials(
-  # Note 'num_sims' is now a vector of 2 numbers, reflecting the
-  # *multilevel* nature of simulations from a hyper_mtdi_distribution:
-  num_sims = c(20 # How many trials to simulate per hyperprior draw
-              ,20 # How many samples to draw from hyperprior
-              )
+  num_sims = 400
 , true_prob_tox = mtdi_gen # pull tox probs from MANY models
 ) -> HYPERSIMS
 
@@ -252,8 +247,7 @@ options(ordinalizer = function(MTDi, r0 = 1.5) {
 })
 
 summary(HYPERSIMS)$safety -> etc.
-etc. %>% kable() %>%
-  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+etc. %>% safety_kable()
 ```
 
 ## Uncertainty about the ordinalizer
@@ -262,13 +256,13 @@ What about our uncertainty over the parameter $r_0$? Here, it seems entirely rea
 
 ```{r}
 r0 <- c(1.25, 1.5, 1.75, 2.0)
-rbind(summary(HYPERSIMS, r0=r0[1])$safety
-     ,summary(HYPERSIMS, r0=r0[2])$safety
-     ,summary(HYPERSIMS, r0=r0[3])$safety
-     ,summary(HYPERSIMS, r0=r0[4])$safety
+rbind(summary(HYPERSIMS, r0=r0[1])$safety[1,]
+     ,summary(HYPERSIMS, r0=r0[2])$safety[1,]
+     ,summary(HYPERSIMS, r0=r0[3])$safety[1,]
+     ,summary(HYPERSIMS, r0=r0[4])$safety[1,]
      ) -> safety
-cbind(data.table(`$r_0$` = r0), safety) %>% kable() %>%
-  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+cbind(data.table(`$r_0$` = r0), safety) %>% kable(digits=2) %>%
+  add_header_above(c(" "=1, "Expected counts by toxicity grade"=6, " "=1))
 ```
 
 # Beyond 3 + 3
@@ -279,13 +273,12 @@ One reason that package `escalation` makes such a suitable basis for these devel
 crm_design <- get_dfcrm(skeleton = scenario, target = 0.25) %>%
   stop_at_n(n = 24)
 crm_design %>% simulate_trials(
-  num_sims = 20 # interpreted as convenient shorthand for c(20,20)
+  num_sims = 200
 , true_prob_tox = mtdi_gen
 ) -> CRM_HYPERSIMS
 
 summary(CRM_HYPERSIMS)$safety -> etc.
-etc. %>% kable() %>%
-  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+etc. %>% safety_kable()
 ```
 
 The BOIN design of [@liu_bayesian_2015] is also supported:
@@ -294,18 +287,17 @@ The BOIN design of [@liu_bayesian_2015] is also supported:
 boin_design <- get_boin(num_doses = 5, target = 0.25) %>%
   stop_at_n(n = 24)
 boin_design %>% simulate_trials(
-  num_sims = 20
+  num_sims = 200
 , true_prob_tox = mtdi_gen
 ) -> BOIN_HYPERSIMS
 
 summary(BOIN_HYPERSIMS)$safety -> etc.
-etc. %>% kable() %>%
-  add_header_above(c(" "=1, "By toxicity grade"=6, " "=1))
+etc. %>% safety_kable()
 ```
 
 # Implications of package `precautionary`
 
-Package `precautionary` demonstrates in principle that any dose-escalation design can be assessed for safety, given a modicum of realistic pharmacologic thinking. prior elicitation. How truly modest this additional input is, should be apparent from the obvious connections between the ratios in an 'ordinalizer' and the notion of [therapeutic index](https://en.wikipedia.org/wiki/Therapeutic_index) (TI). It is hard to imagine that any trialist would pursue a phase 1 investigation without some notion of a plausible range for TI. Yet within the biostatistical literature on dose-finding methods, I know of no attempt to apply a TI concept formally to assess design safety.
+Package `precautionary` demonstrates in principle that any dose-escalation design can be assessed for safety, given a modicum of realistic pharmacologic thinking during prior elicitation. How truly modest this additional input is, should be apparent from the obvious connections between the ratios in an 'ordinalizer' and the notion of [therapeutic index](https://en.wikipedia.org/wiki/Therapeutic_index) (TI). It is hard to imagine that any trialist would pursue a phase 1 investigation without some notion of a plausible range for TI [@muller_determination_2012]. Yet within the biostatistical literature on dose-finding methods, I know of no attempt to apply a TI concept formally to assess design safety.
 
 ```{r echo=FALSE, results='hide'}
 options(old) # restore user's original options before finishing, per CRAN
