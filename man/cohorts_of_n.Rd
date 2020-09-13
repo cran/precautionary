@@ -2,7 +2,7 @@
 % Please edit documentation in R/enhance.R
 \name{cohorts_of_n}
 \alias{cohorts_of_n}
-\title{Override \code{escalation::cohorts_of_n} to include latent toxicity tolerances}
+\title{Override \code{\link[escalation]{cohorts_of_n}} to include latent toxicity tolerances}
 \usage{
 cohorts_of_n(n = 3, mean_time_delta = 1)
 }
@@ -18,7 +18,7 @@ containing respectively the uniformly-distributed latent toxicity tolerance
 and arrival-time increment for each trial participant.
 }
 \description{
-The original function in package \code{escalation} recognizes that individual
+The original function in package \CRANpkg{escalation} recognizes that individual
 trial participants arrive at distinct times. Building upon this acknowledgment
 of individuality, this override adds an extra line of code to draw as well a
 latent toxicity tolerance \code{u_i} for each individual participant.

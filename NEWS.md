@@ -1,3 +1,9 @@
+# precautionary 0.1-3
+
+## Changes
+
+* Added the EscRisk shiny app, runnable by demo(EscRisk)
+
 # precautionary 0.1-2
 
 ## Changes

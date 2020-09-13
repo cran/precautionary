@@ -12,9 +12,9 @@ no equivalent for \code{simulation_function.derived_dose_selector_factory}
 is yet implemented.}
 }
 \description{
-Overrides \code{escalation::simulation_function.tox_selector_factory}
+Overrides \code{\link[escalation:simulation_function]{simulation_function.tox_selector_factory}}
 to return a \code{\link[=phase1_sim]{phase1_sim()}} that employs latent \code{u_i} in place of
-the version native to package \code{escalation}, which merely invokes
+the version native to package \CRANpkg{escalation}, which merely invokes
 \code{rbinom}.
 }
 \details{

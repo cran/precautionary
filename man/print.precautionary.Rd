@@ -2,7 +2,7 @@
 % Please edit documentation in R/enhance.R
 \name{print.precautionary}
 \alias{print.precautionary}
-\title{Specialize print method for objects of class \code{escalation::simulations}}
+\title{Specialize print method for objects of class \code{\link[escalation]{simulations}}}
 \usage{
 \method{print}{precautionary}(x, ...)
 }
@@ -12,5 +12,5 @@
 \item{...}{Additional arguments; ignored}
 }
 \description{
-Specialize print method for objects of class \code{escalation::simulations}
+Specialize print method for objects of class \code{\link[escalation]{simulations}}
 }

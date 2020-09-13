@@ -5,7 +5,7 @@
 \alias{simulate_trials}
 \alias{simulate_trials,selector_factory,numeric,hyper_mtdi_distribution-method}
 \alias{simulate_trials,selector_factory,numeric,mtdi_distribution-method}
-\title{Simulate trials defined via package \code{escalation}}
+\title{Simulate trials defined via package \CRANpkg{escalation}}
 \usage{
 simulate_trials(selector_factory, num_sims, true_prob_tox, ...)
 
@@ -14,7 +14,7 @@ simulate_trials(selector_factory, num_sims, true_prob_tox, ...)
 \S4method{simulate_trials}{selector_factory,numeric,mtdi_distribution}(selector_factory, num_sims, true_prob_tox, ...)
 }
 \arguments{
-\item{selector_factory}{An object of S3 class \code{selector_factory}}
+\item{selector_factory}{An object of S3 class \code{\link[escalation]{selector_factory}}}
 
 \item{num_sims}{Number of simulations to run}
 
@@ -23,7 +23,11 @@ simulate_trials(selector_factory, num_sims, true_prob_tox, ...)
 \item{...}{Passed to subroutines}
 }
 \description{
-Simulate trials defined via package \code{escalation}
+An S4 generic method providing a more abstract interface to trial simulation than
+the \code{\link[escalation]{simulate_trials}} function of package \code{escalation}.
+This abstraction is needed to support simulations in which \code{escalation}'s simple
+vectors of \sQuote{true toxicity probabilities} are replaced by \code{precautionary}'s
+more realistic toxicity-distribution generators.
 }
 \details{
 If invoked interactively with \code{num_sims} > 10, then a

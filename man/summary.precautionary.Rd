@@ -19,6 +19,6 @@ latent toxicity tolerance that characterizes the toxic dose-response of each
 simulated individual trial participant. In conjunction with an
 \sQuote{ordinalizer} function, these extra data enable questions to be asked
 about trial safety, in terms of the probabilities of high-grade toxicities.
-This function specializes the \code{escalation::summary.simulations} method
+This function specializes the \code{escalation:::summary.simulations} method
 accordingly.
 }

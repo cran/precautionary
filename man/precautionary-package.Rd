@@ -19,17 +19,17 @@ in pharmacokinetics and pharmacodynamics.
 \url{https://f1000research.com/articles/6-112/v3}
 \item Norris DC. Costing \sQuote{the} MTD. \emph{bioRxiv}. August 2017:150821.
 \doi{10.1101/150821}.
-\url{http://www.biorxiv.org/content/early/2017/08/22/150821}
+\url{https://www.biorxiv.org/content/10.1101/150821v3}
 \item Norris DC. Precautionary Coherence Unravels Dose Escalation Designs.
 \emph{bioRxiv}. December 2017:240846. \doi{10.1101/240846}.
-\url{https://www.biorxiv.org/content/early/2017/12/29/240846}
+\url{https://www.biorxiv.org/content/10.1101/240846v1}
 \item Norris DC. One-size-fits-all dosing in oncology wastes money, innovation
 and lives. \emph{Drug Discov Today}. 2018;23(1):4-6.
 \doi{10.1016/j.drudis.2017.11.008}.
 \url{https://www.sciencedirect.com/science/article/pii/S1359644617303586}
 \item Norris DC. Costing \sQuote{the} MTD ... in 2-D. \emph{bioRxiv}. July 2018:370817.
 \doi{10.1101/370817}.
-\url{https://www.biorxiv.org/content/early/2018/07/17/370817}
+\url{https://www.biorxiv.org/content/10.1101/370817v1}
 \item Norris DC. Ethical Review and Methodologic Innovation in Phase 1 Cancer Trials.
 \emph{JAMA Pediatrics}. 2019;173(6):609
 \doi{10.1001/jamapediatrics.2019.0811}.
@@ -38,8 +38,8 @@ dose finding. Pharmaceutical Statistics 2019, DOI: 10.1002/pst.1974.
 \emph{Pharmaceutical Statistics}. March 2020.
 \doi{10.1002/pst.2016}.
 \item Norris DC. Retrospective analysis of a fatal dose-finding trial.
-arXiv:2004.12755 [stat, q-bio]. April 2020.
-\url{http://arxiv.org/abs/2004.12755}
+arXiv:2004.12755 [stat.ME]. April 2020.
+\url{https://arxiv.org/abs/2004.12755}
 }
 }
 \author{

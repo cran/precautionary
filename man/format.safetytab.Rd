@@ -38,7 +38,7 @@ old <- options(dose_levels = c(0.5, 1, 2, 4, 6)
 get_boin(num_doses = 5, target = 0.25) \%>\%
   stop_at_n(n = 24) \%>\%
   simulate_trials(
-    num_sims = 80
+    num_sims = 60
   , true_prob_tox = mtdi_gen) -> boin_hsims
 safety <- summary(boin_hsims)$safety
 safety # The print method invokes 'format.safetytab' ..

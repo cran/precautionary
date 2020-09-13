@@ -2,7 +2,7 @@
 % Please edit documentation in R/enhance.R
 \name{print.hyper}
 \alias{print.hyper}
-\title{Specialize print method defined for class \code{escalation::simulations}}
+\title{Specialize print method defined for class \code{\link[escalation]{simulations}}}
 \usage{
 \method{print}{hyper}(x, ...)
 }
@@ -12,5 +12,5 @@
 \item{...}{Additional arguments; ignored}
 }
 \description{
-Specialize print method defined for class \code{escalation::simulations}
+Specialize print method defined for class \code{\link[escalation]{simulations}}
 }

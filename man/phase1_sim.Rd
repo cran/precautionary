@@ -2,7 +2,7 @@
 % Please edit documentation in R/enhance.R
 \name{phase1_sim}
 \alias{phase1_sim}
-\title{Override \code{escalation::phase1_sim} to incorporate latent toxicity tolerances}
+\title{Override \code{escalation:::phase1_sim} to incorporate latent toxicity tolerances}
 \usage{
 phase1_sim(
   selector_factory,
@@ -15,7 +15,7 @@ phase1_sim(
 )
 }
 \arguments{
-\item{selector_factory}{An \code{escalation::selector_factory} object}
+\item{selector_factory}{An \code{\link[escalation]{selector_factory}} object}
 
 \item{true_prob_tox}{A vector of toxicity probabilities for the doses
 defined in \code{selector_factory}}
@@ -33,5 +33,5 @@ package \code{precautionary}}
 \item{return_all_fits}{Don't do this}
 }
 \description{
-Override \code{escalation::phase1_sim} to incorporate latent toxicity tolerances
+Override \code{escalation:::phase1_sim} to incorporate latent toxicity tolerances
 }
