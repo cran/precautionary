@@ -1,3 +1,9 @@
+# precautionary 0.1-5
+
+## Changes
+
+* Accommodate new 'true_prob_eff' arg in escalation::simulate_trials
+
 # precautionary 0.1-4
 
 ## Changes

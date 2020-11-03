@@ -49,3 +49,50 @@
 #' @import data.table
 NULL
 
+#' Ordinalizers
+#' 
+#' TODO: Explain ordinalization and ordinalizers here.
+#' 
+#' @section Limitations:
+#' TODO: Be sure to note the highly restrictive assumptions made about
+#' ordinalizer functions, especially as noted e.g. in connection with
+#' the internal function G (defined in 'exact.R').
+#' 
+#' @section Validity:
+#' The validity of an ordinalizer might well be programmatically testable.
+#' If so, all this discussion might well be carried out in documentation
+#' for a validity-testing function.
+#' 
+#' @name ordinalizer
+#' @aliases ordinalizers ordinalization
+NULL
+
+#' Plan
+#' 
+#' @section Document:
+#' * Under \link{exact}, a 'Details' section detailing the matrix math
+#' 
+#' @section Refactor:
+#' * Remove the `$safety` component of exact trials?
+#'   - Perhaps this ought to be calculated 'on the fly' by the summary method.
+#'   - On-the-fly calculation would postpone use of ordinalizer, in keeping with
+#'     the pattern established already for (non-exact) simulations.
+#' * 
+#' * 
+#' 
+#' @section Extend:
+#' * Implement exact 3+3 variant with \code{allow_deescalation=FALSE}
+#' * Implement rolling 6
+#' * Allow an accelerated titration phase
+#'   - Note that this requires access to graded toxicities at simulation time,
+#'     and therefore constitutes a substantial challenge to the generalizability
+#'     of this software design.
+#' * Index `sims$fits` to exact outcomes in `A[[D]]` where appropriate
+#'   - See the `haystack` function in `exact.R`
+#' 
+#' @section Robustify:
+#' * Tests using multiple CRAN packages
+#' 
+#' @name plan
+#' @aliases todo
+NULL

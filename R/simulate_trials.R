@@ -13,6 +13,7 @@ NULL
 #' @param selector_factory An object of S3 class \code{\link[escalation]{selector_factory}}
 #' @param num_sims Number of simulations to run
 #' @param true_prob_tox A generator of toxicity distributions
+#' @param true_prob_eff Provided for compatibility with \code{\link[escalation]{simulate_trials}}
 #' @param ... Passed to subroutines
 #' 
 #' @details If invoked interactively with \code{num_sims} > 10, then a
@@ -58,7 +59,8 @@ setOldClass(c('stop_at_n_selector_factory',
 #' , 300
 #' , 15 # avoid taxing CRAN servers
 #' )
-#' hsims <- get_three_plus_three(num_doses = 6) %>%
+#' hsims <- get_three_plus_three(num_doses = 6,
+#'                               allow_deescalate = TRUE) %>%
 #'   simulate_trials(
 #'     num_sims = num_sims
 #'   , true_prob_tox = mtdi_gen)
@@ -104,7 +106,6 @@ setMethod(
     dose_levels <- getOption("dose_levels", default = stop(
       "simulate_trials methods require option(dose_levels)."))
     mtdi_samples <- draw_samples(hyper = true_prob_tox, n = num_sims)
-    P_ <- seq_along(dose_levels)
     fits <- list()
     tpts <- list()
     if (interactive() && num_sims > 10) pb <- txtProgressBar(max = num_sims, style = 3)
@@ -233,6 +234,154 @@ setMethod(
   }
 )
 
+#' @examples
+#' old <- options(
+#'   dose_levels = c(0.5, 1, 2, 4, 6),
+#'   ordinalizer = function(MTDi, r0 = 1.5) {
+#'     MTDi * r0 ^ c(Gr1=-2, Gr2=-1, Gr3=0, Gr4=1, Gr5=2)
+#'   })
+#' mtdi_dist <- mtdi_lognormal(CV = 2
+#'                             ,median = 5
+#'                             ,units = "mg/kg")
+#' design <- get_three_plus_three(num_doses = 5, allow_deescalate = TRUE)
+#' # Note use of wrapper function 'exact'; see ?precautionary::exact.
+#' exact(design) %>% simulate_trials(true_prob_tox = mtdi_dist) -> EXACT
+#' summary(EXACT)$safety
+#' if (interactive()) { # don't overtax CRAN servers
+#' # Compare with result of discrete-event simulation
+#' design %>% simulate_trials(
+#'   num_sims = 200
+#'   , true_prob_tox = mtdi_dist
+#' ) -> SIMS
+#' summary(SIMS)$safety
+#' }
+#' options(old)
+#' @rdname simulate_trials
+#' @export
+setMethod(
+  "simulate_trials"
+  # TODO: Is there any way for S4 signature to select on an S3 class hierarchy?
+  #, c(selector_factory=c("exact","three_plus_three_selector_factory"),
+  , c(selector_factory="exact",
+      num_sims="missing",
+      true_prob_tox="mtdi_distribution"),
+  function(selector_factory, true_prob_tox, ...){
+    protocol <- selector_factory # separate naming from implementation details
+    dose_levels <- getOption("dose_levels", default = stop(
+      "simulate_trials methods require option(dose_levels)."))
+    D <- length(dose_levels)
+    # Calculate the length-2D vector c(log(p), log(1-p))
+    p <- true_prob_tox@dist$cdf(dose_levels)
+    q <- 1 - p
+    log_pq <- c(log(p), log(q))
+    names(log_pq) <- rep(paste(getOption('dose_levels'), true_prob_tox@units), 2)
+    log_pi = b[[D]] + U[[D]] %*% pmax(log_pq, -500) # clamping -Inf to -500 avoids NaN's
+    exact <- list(
+      log_pi = log_pi
+    , safety = t(exp(log_pi)) %*% U[[D]] %*% G(true_prob_tox, ...)
+    , fits = NULL
+    , protocol = protocol
+    , extra_params = list(...)
+    , dose_levels = dose_levels
+    , dose_units = true_prob_tox@units
+    , mtdi_dist = true_prob_tox
+    , true_prob_tox = true_prob_tox@dist$cdf(getOption("dose_levels"))
+    )
+    # TODO: Consider whether an 'exact' object ought to incorporate other data
+    #       such as would be useful for vetting the result, or even supporting
+    #       certain summary methods of package:escalation.
+    prependClass("exact", exact)
+  }
+)
+
+# Throw error in case user invokes this nonsense signature.
+# This is all too easy to invoke, because the difference is
+# between mtdi_distribution and hyper_mtdi_distribution
+# in the 3rd parameter.
+#' @rdname simulate_trials
+#' @export
+setMethod(
+  "simulate_trials"
+  , c(selector_factory="exact",
+      num_sims="numeric",
+      true_prob_tox="mtdi_distribution",
+      true_prob_eff="missing"),
+  function(selector_factory, num_sims, true_prob_tox, ...){
+    stop("num_sims makes no sense for exact simulation of mtdi_distribution")
+  }
+)
+
+#' @examples
+#' old <- options(dose_levels = c(0.5, 1, 2, 4, 6, 8))
+#' mtdi_gen <- hyper_mtdi_lognormal(CV = 1
+#'                                  , median_mtd = 6, median_sdlog = 0.5
+#'                                  , units="mg/kg")
+#' options(ordinalizer = function(dose, r0 = sqrt(2))
+#'   c(Gr1=dose/r0^2, Gr2=dose/r0, Gr3=dose, Gr4=dose*r0, Gr5=dose*r0^2)
+#' )
+#' design <- get_three_plus_three(num_doses = 6, allow_deescalate = TRUE)
+#' ehsims <- simulate_trials(
+#'   exact(design)
+#'   , num_sims = 50
+#'   , true_prob_tox = mtdi_gen
+#' )
+#' summary(ehsims)$safety
+#' options(old)
+#' @rdname simulate_trials
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @export
+setMethod(
+  "simulate_trials"
+  , c(selector_factory="exact",
+      num_sims="numeric",
+      true_prob_tox="hyper_mtdi_distribution",
+      true_prob_eff="missing"),
+  function(selector_factory, num_sims, true_prob_tox, ...){
+    protocol <- selector_factory # separate naming from implementation details
+    stopifnot("num_sims must be of length 1" = length(num_sims) == 1)
+    # The most parsimonious generalization of the default function
+    # will substitute a *matrix* for the default result's vector
+    # attribute 'true_prob_tox'.
+    dose_levels <- getOption("dose_levels", default = stop(
+      "simulate_trials methods require option(dose_levels)."))
+    mtdi_samples <- draw_samples(hyper = true_prob_tox, n = num_sims)
+    tpts <- safetys <- list()
+    # TODO: Consider increasing the 100 below even further
+    if (interactive() && num_sims > 100) pb <- txtProgressBar(max = num_sims, style = 3)
+    for(k in 1:num_sims){
+      exact_k <- simulate_trials(selector_factory = protocol
+                                 ,true_prob_tox = mtdi_samples[[k]]
+                                 ,...)
+      tpts[[k]] <- exact_k$true_prob_tox
+      safetys[[k]] <- exact_k$safety
+      if (exists("pb")) setTxtProgressBar(pb, k)
+    }
+    if (exists("pb")) close(pb)
+    tpt_matrix <- do.call(rbind, tpts)
+    colnames(tpt_matrix) <- paste0(dose_levels, true_prob_tox@units)
+    exact <- list(
+      fits = NULL
+      # NB: We take the trouble to select the leftmost length(dose_levels) columns
+      #     in order to allow for the possibility that the tpt_matrix in general
+      #     may also include hyperparameters in columns to the right. This was a
+      #     feature (mainly for debugging) of earlier versions of this code, but
+      #     seems worth allowing for, pace 'speculative generality'.
+      , avg_prob_tox = colMeans(tpt_matrix[, seq_along(dose_levels)])
+      , hyper = list(true_prob_tox = tpt_matrix
+                     ,mtdi = true_prob_tox
+                     ,mtdi_samples = t(sapply(mtdi_samples,function(.)
+                       c(CV = .@CV, median = .@median)))
+                     ,safety = do.call(rbind, safetys)
+      )
+      , protocol = protocol
+      , extra_params = list(...)
+    )
+    exact$dose_levels <- dose_levels
+    exact$dose_units <- true_prob_tox@units
+    prependClass(c("hyper","exact"), exact)
+  }
+)
+
 #' Extend an existing simulation, using one of several stopping criteria
 #'
 #' A trial simulation carried through a predetermined number of replications
@@ -333,17 +482,55 @@ extend.hyper <- function(sims, num_sims = NULL, target_mcse = 0.05) {
                                        ,sims$extra_params
                                        )
                     )
-    N1 <- length(sims$fits)
-    N2 <- length(more$fits)
+    N1 <- nrow(sims$hyper$true_prob_tox) # TODO: add an N.hyper method for this
+    N2 <- nrow(more$hyper$true_prob_tox)
     sims$avg_prob_tox <- (sims$avg_prob_tox*N1 + more$avg_prob_tox*N2)/(N1+N2)
     sims$fits <- c(sims$fits, more$fits)
     sims$hyper$true_prob_tox <- rbind(sims$hyper$true_prob_tox
                                       ,more$hyper$true_prob_tox)
-    sims$hyper$mtdi_samples <- c(sims$hyper$mtdi_sample
-                                 ,more$hyper$mtdi_sample)
+    sims$hyper$mtdi_samples <- rbind(sims$hyper$mtdi_sample
+                                     ,more$hyper$mtdi_sample)
+    # In case of 'exact' sim, we will have also a $hyper$safety matrix
+    # TODO: Dispense with the conditional, given the idempotency of NULL?
+    if (!is.null(sims$hyper$safety))
+      sims$hyper$safety <- rbind(sims$hyper$safety
+                                 ,more$hyper$safety)
     return(sims)
   }
   # The more sensible use case: extending sim to target MCSEs
   NextMethod() # recursive case handled fine by extend.precautionary
+}
+
+# TODO: Render an 'exact' alternative to extend.precautionary,
+#       such that the recursive call to NextMethod() at the
+#       bottom of extend.hyper works fine for exact case too.
+# TODO: Would it be proper NOT to export this, to prevent users
+#       from calling it directly?
+#' @export
+extend.exact <- function(sims, num_sims = NULL, target_mcse = 0.05) {
+  stopifnot("Extending a non-hyper exact sim is pointless" = is(sims,'hyper'))
+  stopifnot("'extend.exact' should never see non-NULL num_sims" = is.null(num_sims))
+  # The more sensible use case: extending sim to target MCSEs
+  # TODO: Exploit the existing sims$safety['MCSE',] component
+  x_to_tgt <- function(sims, target_mcse) {
+    current_mcse <- max(summary(sims)$safety['MCSE',])
+    if ( current_mcse < target_mcse )
+      return(0)
+    extension_factor <- ( current_mcse / target_mcse )^2 - 1
+    sims_todo_est <- nrow(sims$hyper$true_prob_tox) * extension_factor
+    sims_todo_est <- ceiling(sims_todo_est) # awkward to do fractional sims ;^)
+    sims_todo_est
+  }
+  sims_todo_est <- x_to_tgt(sims, target_mcse)
+  if(interactive()) pb <- txtProgressBar(max = 1, style = 3)
+  while (sims_todo_est > 0) {
+    sims <- extend(sims, num_sims = 100) # for 'exact', num_sims < 101 avoids nested progress bar
+    sims_done <- nrow(sims$hyper$true_prob_tox)
+    sims_todo_est <- x_to_tgt(sims, target_mcse)
+    fraction_complete <- sims_done / (sims_done + sims_todo_est)
+    if (exists("pb")) setTxtProgressBar(pb, fraction_complete)
+  }
+  if (exists("pb")) close(pb)
+  sims
 }
 

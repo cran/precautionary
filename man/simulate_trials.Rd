@@ -3,15 +3,60 @@
 \docType{methods}
 \name{simulate_trials}
 \alias{simulate_trials}
-\alias{simulate_trials,selector_factory,numeric,hyper_mtdi_distribution-method}
-\alias{simulate_trials,selector_factory,numeric,mtdi_distribution-method}
+\alias{simulate_trials,selector_factory,numeric,hyper_mtdi_distribution,ANY-method}
+\alias{simulate_trials,selector_factory,numeric,mtdi_distribution,ANY-method}
+\alias{simulate_trials,exact,missing,mtdi_distribution,ANY-method}
+\alias{simulate_trials,exact,numeric,mtdi_distribution,missing-method}
+\alias{simulate_trials,exact,numeric,hyper_mtdi_distribution,missing-method}
 \title{Simulate trials defined via package \CRANpkg{escalation}}
 \usage{
-simulate_trials(selector_factory, num_sims, true_prob_tox, ...)
+simulate_trials(
+  selector_factory,
+  num_sims,
+  true_prob_tox,
+  true_prob_eff = NULL,
+  ...
+)
 
-\S4method{simulate_trials}{selector_factory,numeric,hyper_mtdi_distribution}(selector_factory, num_sims, true_prob_tox, ...)
+\S4method{simulate_trials}{selector_factory,numeric,hyper_mtdi_distribution,ANY}(
+  selector_factory,
+  num_sims,
+  true_prob_tox,
+  true_prob_eff = NULL,
+  ...
+)
 
-\S4method{simulate_trials}{selector_factory,numeric,mtdi_distribution}(selector_factory, num_sims, true_prob_tox, ...)
+\S4method{simulate_trials}{selector_factory,numeric,mtdi_distribution,ANY}(
+  selector_factory,
+  num_sims,
+  true_prob_tox,
+  true_prob_eff = NULL,
+  ...
+)
+
+\S4method{simulate_trials}{exact,missing,mtdi_distribution,ANY}(
+  selector_factory,
+  num_sims,
+  true_prob_tox,
+  true_prob_eff = NULL,
+  ...
+)
+
+\S4method{simulate_trials}{exact,numeric,mtdi_distribution,missing}(
+  selector_factory,
+  num_sims,
+  true_prob_tox,
+  true_prob_eff = NULL,
+  ...
+)
+
+\S4method{simulate_trials}{exact,numeric,hyper_mtdi_distribution,missing}(
+  selector_factory,
+  num_sims,
+  true_prob_tox,
+  true_prob_eff = NULL,
+  ...
+)
 }
 \arguments{
 \item{selector_factory}{An object of S3 class \code{\link[escalation]{selector_factory}}}
@@ -19,6 +64,8 @@ simulate_trials(selector_factory, num_sims, true_prob_tox, ...)
 \item{num_sims}{Number of simulations to run}
 
 \item{true_prob_tox}{A generator of toxicity distributions}
+
+\item{true_prob_eff}{Provided for compatibility with \code{\link[escalation]{simulate_trials}}}
 
 \item{...}{Passed to subroutines}
 }
@@ -45,7 +92,8 @@ num_sims <- ifelse(interactive()
 , 300
 , 15 # avoid taxing CRAN servers
 )
-hsims <- get_three_plus_three(num_doses = 6) \%>\%
+hsims <- get_three_plus_three(num_doses = 6,
+                              allow_deescalate = TRUE) \%>\%
   simulate_trials(
     num_sims = num_sims
   , true_prob_tox = mtdi_gen)
@@ -110,5 +158,41 @@ summary(crm_sims
     MTDi * r0^c(Gr1=-2, Gr2=-1, Gr3=0, Gr4=1, Gr5=2)
 )$safety
 }
+options(old)
+old <- options(
+  dose_levels = c(0.5, 1, 2, 4, 6),
+  ordinalizer = function(MTDi, r0 = 1.5) {
+    MTDi * r0 ^ c(Gr1=-2, Gr2=-1, Gr3=0, Gr4=1, Gr5=2)
+  })
+mtdi_dist <- mtdi_lognormal(CV = 2
+                            ,median = 5
+                            ,units = "mg/kg")
+design <- get_three_plus_three(num_doses = 5, allow_deescalate = TRUE)
+# Note use of wrapper function 'exact'; see ?precautionary::exact.
+exact(design) \%>\% simulate_trials(true_prob_tox = mtdi_dist) -> EXACT
+summary(EXACT)$safety
+if (interactive()) { # don't overtax CRAN servers
+# Compare with result of discrete-event simulation
+design \%>\% simulate_trials(
+  num_sims = 200
+  , true_prob_tox = mtdi_dist
+) -> SIMS
+summary(SIMS)$safety
+}
+options(old)
+old <- options(dose_levels = c(0.5, 1, 2, 4, 6, 8))
+mtdi_gen <- hyper_mtdi_lognormal(CV = 1
+                                 , median_mtd = 6, median_sdlog = 0.5
+                                 , units="mg/kg")
+options(ordinalizer = function(dose, r0 = sqrt(2))
+  c(Gr1=dose/r0^2, Gr2=dose/r0, Gr3=dose, Gr4=dose*r0, Gr5=dose*r0^2)
+)
+design <- get_three_plus_three(num_doses = 6, allow_deescalate = TRUE)
+ehsims <- simulate_trials(
+  exact(design)
+  , num_sims = 50
+  , true_prob_tox = mtdi_gen
+)
+summary(ehsims)$safety
 options(old)
 }
