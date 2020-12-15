@@ -10,7 +10,7 @@ Plan
 \section{Document}{
 
 \itemize{
-\item Under \link{exact}, a 'Details' section detailing the matrix math
+\item Add a proper vignette detailing and exploring exact 3+3 calculations
 }
 }
 
@@ -23,8 +23,9 @@ Plan
 \item On-the-fly calculation would postpone use of ordinalizer, in keeping with
 the pattern established already for (non-exact) simulations.
 }
-\item 
-\item 
+\item Should summary(EXACT)$safety bear class 'safetytab'?
+\item Example for 'as.data.table.exact'
+\item What is role of G function in exact.R?
 }
 }
 
@@ -49,7 +50,7 @@ of this software design.
 \section{Robustify}{
 
 \itemize{
-\item Tests using multiple CRAN packages
+\item Tests comparing results from multiple CRAN packages
 }
 }
 

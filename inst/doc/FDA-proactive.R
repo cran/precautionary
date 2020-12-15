@@ -44,7 +44,7 @@ set.seed(2020)
 design %>% simulate_trials(
   num_sims = 100
 , true_prob_tox = mtdi_gen
-) %>% extend(target_mcse = 0.05) -> SIMS
+) %>% extend(target_mcse = 0.1) -> SIMS
 
 ## ----summarize----------------------------------------------------------------
 summary(SIMS,r0 = 2)$safety %>%

@@ -44,6 +44,10 @@
 #'    arXiv:2004.12755 \[stat.ME\]. April 2020.
 #'    \url{https://arxiv.org/abs/2004.12755}
 #' 
+#' 9. Norris DC. What Were They Thinking? Pharmacologic priors implicit in a choice
+#'    of 3+3 dose-escalation design. arXiv:2012.05301 \[stat.ME\]. December 2020.
+#'    \url{https://arxiv.org/abs/2012.05301}
+#' 
 #' @import methods
 #' @import magrittr
 #' @import data.table
@@ -70,15 +74,16 @@ NULL
 #' Plan
 #' 
 #' @section Document:
-#' * Under \link{exact}, a 'Details' section detailing the matrix math
+#' * Add a proper vignette detailing and exploring exact 3+3 calculations
 #' 
 #' @section Refactor:
 #' * Remove the `$safety` component of exact trials?
 #'   - Perhaps this ought to be calculated 'on the fly' by the summary method.
 #'   - On-the-fly calculation would postpone use of ordinalizer, in keeping with
 #'     the pattern established already for (non-exact) simulations.
-#' * 
-#' * 
+#' * Should summary(EXACT)$safety bear class 'safetytab'?
+#' * Example for 'as.data.table.exact'
+#' * What is role of G function in exact.R?
 #' 
 #' @section Extend:
 #' * Implement exact 3+3 variant with \code{allow_deescalation=FALSE}
@@ -91,7 +96,7 @@ NULL
 #'   - See the `haystack` function in `exact.R`
 #' 
 #' @section Robustify:
-#' * Tests using multiple CRAN packages
+#' * Tests comparing results from multiple CRAN packages
 #' 
 #' @name plan
 #' @aliases todo
