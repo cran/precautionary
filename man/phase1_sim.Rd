@@ -15,7 +15,7 @@ phase1_sim(
 )
 }
 \arguments{
-\item{selector_factory}{An \code{\link[escalation]{selector_factory}} object}
+\item{selector_factory}{A \code{\link[escalation]{selector_factory}} object}
 
 \item{true_prob_tox}{A vector of toxicity probabilities for the doses
 defined in \code{selector_factory}}
