@@ -7,10 +7,101 @@
 \description{
 Plan
 }
+\section{Version 0.2.6-1}{
+
+\itemize{
+\item Improve feedback during long calculations
+\itemize{
+\item Set J = '...' pending first progress report
+\item Analyze where \code{Cpe$path_array()} spends time
+\item Give suitable feedback on \code{path_array} progress
+}
+}
+}
+
+\section{Version 0.2.7}{
+
+\itemize{
+\item Demote \pkg{escalation} to a 'Suggests'
+\item Thoroughly rewrite 'Intro' and 'FDA Clinical Hold' vignettes
+}
+}
+
+\section{Version 0.2.8}{
+
+\itemize{
+\item BOIN recs via isotonic regression
+\item Test-that CPE matches \code{BOIN::get.oc()} sim
+\item Implement CRM logistic model
+}
+}
+
+\section{Version 0.2.9}{
+
+\itemize{
+\item Implement TITE CRM?
+\itemize{
+\item Is TITE even amenable to path enumeration?
+\item If not, there may be little sense in implementing it here!
+\item If TITE is truly off the table, can existing numerics be
+sped up further?
+\item OTOH, implementing TITE would help place the numerics
+for enumerable designs in context.
+}
+}
+}
+
+\section{Version 0.3.0}{
+
+\itemize{
+\item Stop exposing the \code{impl} parameter
+}
+}
+
+\section{Version 0.3.1}{
+
+\itemize{
+\item Native Rust CPE
+}
+}
+
+\section{Dependencies}{
+
+\itemize{
+\item Eliminate dependence on/adherence to \code{dtpcrm} layout
+\itemize{
+\item Package \code{dtpcrm} makes many design decisions unsuited to
+comprehensive enumeration of whole trials.
+\item Allowing the \code{Crm} class to evolve along now-'natural' lines
+probably makes a suitable 'plan' for now.
+\item Expunging superseded code/dependencies ASAP will facilitate
+this evolution.
+\item Even the term 'DTP' seems not quite right anymore for a complete
+path enumeration (CPE?), and should be abandoned.
+}
+\item Eliminate dependence on \code{escalation} and \code{dfcrm}
+\itemize{
+\item With the special emphasis on \emph{speed} created by CPE,
+I now must implement all underlying trial designs in Rust.
+}
+\item What may be retained in each case are 'Suggests:'-type relations,
+wherever regression tests are helpful -- esp. wrt \code{dfcrm}.
+}
+}
+
+\section{Fast CRM}{
+
+\itemize{
+\item Benchmark; try \code{mul_add()}s
+}
+}
+
 \section{Document}{
 
 \itemize{
-\item Add a proper vignette detailing and exploring exact 3+3 calculations
+\item Add examples to the documented Rust functions
+\item Add a vignette applying DTP to mTPI and BOIN
+\item Expose some visual numerics checks, via vignette or documented function
 }
 }
 
@@ -47,7 +138,7 @@ of this software design.
 }
 }
 
-\section{Robustify}{
+\section{Robustness}{
 
 \itemize{
 \item Tests comparing results from multiple CRAN packages

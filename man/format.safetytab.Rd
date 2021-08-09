@@ -46,7 +46,7 @@ safety # The print method invokes 'format.safetytab' ..
 safety[,]  # indexing strips 'safetytab' class, returning plain matrix
 # Note that, by extend()ing the simulation we can increase precision:
 if (interactive()) { # may run a bit too long for CRAN servers' taste
-  boin_hsims \%>\% extend(target_mcse = 0.1) -> boin_hsimsX 
+  boin_hsims \%>\% extend(target_mcse = 0.1) -> boin_hsimsX
   summary(boin_hsimsX)$safety
 }
 options(old)

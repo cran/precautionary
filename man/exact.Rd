@@ -43,7 +43,7 @@ As detailed in Norris 2020c (below), these matrices may be used to construct sim
 matrix computations that altogether eliminate the need for discrete-event simulation
 of the 3+3 design. For each \eqn{D = 2,...,8}, the \code{precautionary} package has
 pretabulated a \eqn{J \times 2D}{J x 2D} matrix \code{precautionary:::U[[D]]} and
-\eqn{J}-vector \code{precautionary:::b[[D]]} such that the eqn{J}-vector \eqn{\pi}
+\eqn{J}-vector \code{precautionary:::b[[D]]} such that the \eqn{J}-vector \eqn{\pi}
 of path probabilities is given by:
 \deqn{
 log(\pi) = b + U [log(p), log(q)]',
@@ -53,7 +53,7 @@ doses, and \eqn{q \equiv 1-p}{q := 1-p} is its complement. See Eq. (4) of
 Norris (2020c).
 
 For details on the enumeration itself, please see the Prolog code in directory
-\code{exec/} of the installed package.
+\verb{exec/} of the installed package.
 }
 \examples{
 # Run an exact version of the simulation from FDA-proactive vignette

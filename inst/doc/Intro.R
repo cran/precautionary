@@ -23,7 +23,7 @@ local({
 
 ## ----basic-sim----------------------------------------------------------------
 library(escalation)
-# Design a 3 + 3 trial, with 5 pre-specified doses to escalate through
+# Design a 3 + 3 trial, with 5 prespecified doses to escalate through
 design <- get_three_plus_three(num_doses = 5)
 # Posit a scenario where these 5 doses cause dose-limiting toxicities
 # (DLTs) in 12%, 27%, etc. of the population:

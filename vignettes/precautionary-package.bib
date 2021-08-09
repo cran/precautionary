@@ -1,4 +1,33 @@
 
+@article{gustafson_reevaluating_1988,
+	title = {Reevaluating {Amdahl}'s {Law}},
+	volume = {31},
+	abstract = {At Sandia National Laboratories, we are currently engaged in research involving massively-parallel processing. There is considerable skepticism regarding the viability of massive parallelism; the skepticism centers around Amdahl’s law, an argument put forth by Gene Amdahl in 1967 [1] that even when the fraction of serial work in a given problem is small, say s, the maximum speedup obtainable from even an infinite number of parallel processors is only 1/s. We now have timing results for a 1024-processor system that demonstrate that the assumptions underlying Amdahl’s 1967 argument are inappropriate for the current approach to massive ensemble parallelism. If N is the number of processors, s is the amount of time spent (by a serial processor) on serial parts of a program and p is the amount of time spent (by a serial processor) on parts of the program that can be done in parallel, then Amdahl’s law says that speedup is given by Speedup = (s + p)  ⁄  ( s + p ⁄ N) = 1 ⁄  ( s + p ⁄ N), where we have set total time s␣+␣p ␣=␣1 for algebraic simplicity. For N = 1024, this is an unforgivingly steep function of s near s = 0 (see Figure 1). The steepness of the graph near s = 0 (approximately – N 2) implies that very few problems will experience even a 100-fold speedup. Yet for three very practical applications (s = 0.4 – 0.8 percent) used at Sandia, we have achieved the speedup factors on a 1024-processor hypercube which we believe are unprecedented [2]: 1021 for beam stress analysis using conjugate gradients, 1020 for baffled surface wave simulation using explicit finite differences, and 1016 for unstable fluid flow using flux-corrected transport. How can this be, when Amdahl’s argument would predict otherwise?},
+	journal = {Communications of the ACM},
+	author = {Gustafson, John L.},
+	year = {1988},
+	pages = {532--533},
+	file = {Citeseer - Snapshot:/Users/david/zotero/storage/E87PMJ7P/summary.html:text/html;Gustafson - 1988 - Reevaluating Amdahl's Law.pdf:/Users/david/zotero/storage/368S8JQ5/Gustafson - 1988 - Reevaluating Amdahl's Law.pdf:application/pdf}
+}
+
+@article{oquigley_continual_1990,
+	title = {Continual reassessment method: a practical design for phase 1 clinical trials in cancer},
+	volume = {46},
+	issn = {0006-341X},
+	shorttitle = {Continual reassessment method},
+	abstract = {This paper looks at a new approach to the design and analysis of Phase 1 clinical trials in cancer. The basic idea and motivation behind the approach stem from an attempt to reconcile the needs of dose-finding experimentation with the ethical demands of established medical practice. It is argued that for these trials the particular shape of the dose toxicity curve is of little interest. Attention focuses rather on identifying a dose with a given targeted toxicity level and on concentrating experimentation at that which all current available evidence indicates to be the best estimate of this level. Such an approach not only makes an explicit attempt to meet ethical requirements but also enables the use of models whose only requirements are that locally (i.e., around the dose corresponding to the targeted toxicity level) they reasonably well approximate the true probability of toxic response. Although a large number of models could be contemplated, we look at a particularly simple one. Extensive simulations show the model to have real promise.},
+	language = {eng},
+	number = {1},
+	journal = {Biometrics},
+	author = {O'Quigley, J. and Pepe, M. and Fisher, L.},
+	month = mar,
+	year = {1990},
+	pmid = {2350571},
+	keywords = {Antineoplastic Agents, Neoplasms, Models, Statistical, Biometry, Humans, READ, Clinical Protocols, Drug Evaluation, TTR},
+	pages = {33--48},
+	file = {O'Quigley et al. - 1990 - Continual reassessment method a practical design .pdf:/Users/david/zotero/storage/FXPD7E72/O'Quigley et al. - 1990 - Continual reassessment method a practical design .pdf:application/pdf}
+}
+
 @article{simon_accelerated_1997,
 	title = {Accelerated titration designs for phase {I} clinical trials in oncology},
 	volume = {89},
@@ -15,7 +44,7 @@ CONCLUSION: Accelerated titration (i.e., rapid intrapatient drug dose escalation
 	month = aug,
 	year = {1997},
 	pmid = {9262252},
-	keywords = {Antineoplastic Agents, Neoplasms, Models, Statistical, Research Design, Humans, Clinical Trials, Phase I as Topic, Drug Administration Schedule, CITE, Quinoxalines, Sulfanilamides},
+	keywords = {Antineoplastic Agents, CITE, Clinical Trials, Phase I as Topic, Drug Administration Schedule, Humans, Models, Statistical, Neoplasms, Quinoxalines, Research Design, Sulfanilamides},
 	pages = {1138--1147},
 	file = {Simon et al. - 1997 - Accelerated titration designs for phase I clinical.pdf:/Users/david/zotero/storage/RSPWMWC7/Simon et al. - 1997 - Accelerated titration designs for phase I clinical.pdf:application/pdf}
 }
@@ -103,6 +132,41 @@ CONCLUSION: Accelerated titration (i.e., rapid intrapatient drug dose escalation
 	file = {Liu and Yuan - 2015 - Bayesian optimal interval designs for phase I clin.pdf:/Users/david/zotero/storage/7X9BJAZB/Liu and Yuan - 2015 - Bayesian optimal interval designs for phase I clin.pdf:application/pdf;Snapshot:/Users/david/zotero/storage/PE9F27HH/abstract\;jsessionid=191B0E81660F989F966EEF0F15E6634F.html:text/html}
 }
 
+@article{yin_bayesian_2009,
+	title = {Bayesian {Model} {Averaging} {Continual} {Reassessment} {Method} in {Phase} {I} {Clinical} {Trials}},
+	volume = {104},
+	issn = {0162-1459},
+	url = {http://www.tandfonline.com/doi/10.1198/jasa.2009.ap08425},
+	doi = {10.1198/jasa.2009.ap08425},
+	abstract = {The continual reassessment method (CRM) is a popular dose-finding design for phase I clinical trials. This method requires that practitioners prespecify the toxicity probability at each dose. Such prespecification can be arbitrary, and different specifications of toxicity probabilities may lead to very different design properties. To overcome the arbitrariness and further enhance the robustness of the design, we propose using multiple parallel CRM models, each with a different set of prespecified toxicity probabilities. In the Bayesian paradigm, we assign a discrete probability mass to each CRM model as the prior model probability. The posterior probabilities of toxicity can be estimated by the Bayesian model averaging (BMA) approach. Dose escalation or deescalation is determined by comparing the target toxicity rate and the BMA estimates of the dose toxicity probabilities. We examine the properties of the BMA-CRM approach through extensive simulation studies, and also compare this new method and its variants with the original CRM. The results demonstrate that our BMA-CRM is competitive and robust, and eliminates the arbitrariness of the prespecification of toxicity probabilities.},
+	number = {487},
+	urldate = {2017-10-05},
+	journal = {Journal of the American Statistical Association},
+	author = {Yin, Guosheng and Yuan, Ying},
+	month = sep,
+	year = {2009},
+	keywords = {READ!!!!},
+	pages = {954--968},
+	file = {Snapshot:/Users/david/zotero/storage/XX6G7P7N/jasa.2009.html:text/html;Yin and Yuan - 2009 - Bayesian Model Averaging Continual Reassessment Me.pdf:/Users/david/zotero/storage/NP7SZ7QA/Yin and Yuan - 2009 - Bayesian Model Averaging Continual Reassessment Me.pdf:application/pdf}
+}
+
+@article{goodman_practical_1995,
+	title = {Some practical improvements in the continual reassessment method for phase {I} studies},
+	volume = {14},
+	issn = {0277-6715},
+	abstract = {The Continual Reassessment Method (CRM) is a Bayesian phase I design whose purpose is to estimate the maximum tolerated dose of a drug that will be used in subsequent phase II and III studies. Its acceptance has been hindered by the greater duration of CRM designs compared to standard methods, as well as by concerns with excessive experimentation at high dosage levels, and with more frequent and severe toxicity. This paper presents the results of a simulation study in which one assigns more than one subject at a time to each dose level, and each dose increase is limited to one level. We show that these modifications address all of the most serious criticisms of the CRM, reducing the duration of the trial by 50-67 per cent, reducing toxicity incidence by 20-35 per cent, and lowering toxicity severity. These are achieved with minimal effects on accuracy. Most important, based on our experience at our institution, such modifications make the CRM acceptable to clinical investigators.},
+	language = {eng},
+	number = {11},
+	journal = {Statistics in Medicine},
+	author = {Goodman, S. N. and Zahurak, M. L. and Piantadosi, S.},
+	month = jun,
+	year = {1995},
+	pmid = {7667557},
+	keywords = {Dose-Response Relationship, Drug, Logistic Models, Reproducibility of Results, Research Design, Bayes Theorem, Humans, Clinical Trials, Phase I as Topic, READ, Data Interpretation, Statistical},
+	pages = {1149--1161},
+	file = {Goodman et al. - 1995 - Some practical improvements in the continual reass.pdf:/Users/david/zotero/storage/2RZSMIBY/Goodman et al. - 1995 - Some practical improvements in the continual reass.pdf:application/pdf}
+}
+
 @article{norris_one-size-fits-all_2018,
 	title = {One-size-fits-all dosing in oncology wastes money, innovation and lives},
 	volume = {23},
@@ -116,6 +180,42 @@ CONCLUSION: Accelerated titration (i.e., rapid intrapatient drug dose escalation
 	pmid = {29170137},
 	pages = {4--6},
 	file = {Norris - 2018 - One-size-fits-all dosing in oncology wastes money,.pdf:/Users/david/zotero/storage/TL5Y5R7C/Norris - 2018 - One-size-fits-all dosing in oncology wastes money,.pdf:application/pdf}
+}
+
+@article{grieve_idle_2016,
+	title = {Idle thoughts of a ‘well-calibrated’ {Bayesian} in clinical drug development},
+	volume = {15},
+	issn = {1539-1612},
+	url = {http://onlinelibrary.wiley.com/doi/10.1002/pst.1736/abstract},
+	doi = {10.1002/pst.1736},
+	abstract = {The use of Bayesian approaches in the regulated world of pharmaceutical drug development has not been without its difficulties or its critics. The recent Food and Drug Administration regulatory guidance on the use of Bayesian approaches in device submissions has mandated an investigation into the operating characteristics of Bayesian approaches and has suggested how to make adjustments in order that the proposed approaches are in a sense calibrated. In this paper, I present examples of frequentist calibration of Bayesian procedures and argue that we need not necessarily aim for perfect calibration but should be allowed to use procedures, which are well-calibrated, a position supported by the guidance. Copyright © 2016 John Wiley \& Sons, Ltd.},
+	language = {en},
+	number = {2},
+	urldate = {2018-03-11},
+	journal = {Pharmaceutical Statistics},
+	author = {Grieve, Andrew P.},
+	month = mar,
+	year = {2016},
+	keywords = {bayesian statistics, calibration, drug development, operating characteristics, planning, READ, simulation},
+	pages = {96--108},
+	file = {Grieve - 2016 - Idle thoughts of a ‘well-calibrated’ Bayesian in c.pdf:/Users/david/zotero/storage/R5KXTMEH/Grieve - 2016 - Idle thoughts of a ‘well-calibrated’ Bayesian in c.pdf:application/pdf;Snapshot:/Users/david/zotero/storage/5C9LXWBW/abstract.html:text/html}
+}
+
+@article{wages_dose-finding_2011,
+	title = {Dose-finding design for multi-drug combinations},
+	volume = {8},
+	issn = {1740-7745, 1740-7753},
+	url = {http://journals.sagepub.com/doi/10.1177/1740774511408748},
+	doi = {10.1177/1740774511408748},
+	language = {en},
+	number = {4},
+	urldate = {2018-06-28},
+	journal = {Clinical Trials: Journal of the Society for Clinical Trials},
+	author = {Wages, Nolan A and Conaway, Mark R and O'Quigley, John},
+	month = aug,
+	year = {2011},
+	pages = {380--389},
+	file = {Wages et al. - 2011 - Dose-finding design for multi-drug combinations.pdf:/Users/david/zotero/storage/QGQ94ZK8/Wages et al. - 2011 - Dose-finding design for multi-drug combinations.pdf:application/pdf}
 }
 
 @article{zhou_accuracy_2018,
@@ -201,9 +301,26 @@ CONCLUSION: We conclude LEN can be administered safely post-allograft in conjunc
 	month = dec,
 	year = {2017},
 	pmid = {28733440},
-	keywords = {Dose-Response Relationship, Drug, Models, Statistical, Clinical Trials as Topic, Humans, Decision Making, Drug-Related Side Effects and Adverse Reactions, Leukemia, Myeloid, Acute, Maximum Tolerated Dose},
+	keywords = {Clinical Trials as Topic, Decision Making, Dose-Response Relationship, Drug, Drug-Related Side Effects and Adverse Reactions, Humans, Leukemia, Myeloid, Acute, Maximum Tolerated Dose, Models, Statistical},
 	pages = {7440--7447},
 	file = {Yap et al. - 2017 - Dose Transition Pathways The Missing Link Between.pdf:/Users/david/zotero/storage/LR9GSZH8/Yap et al. - 2017 - Dose Transition Pathways The Missing Link Between.pdf:application/pdf}
+}
+
+@article{clertant_semiparametric_2017,
+	title = {Semiparametric dose finding methods},
+	volume = {79},
+	issn = {13697412},
+	url = {http://doi.wiley.com/10.1111/rssb.12229},
+	doi = {10.1111/rssb.12229},
+	language = {en},
+	number = {5},
+	urldate = {2019-11-10},
+	journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+	author = {Clertant, M. and O'Quigley, J.},
+	month = nov,
+	year = {2017},
+	pages = {1487--1508},
+	file = {Clertant and O’Quigley - 2017 - Semiparametric dose finding methods.pdf:/Users/david/zotero/storage/727FPCXJ/Clertant and O’Quigley - 2017 - Semiparametric dose finding methods.pdf:application/pdf}
 }
 
 @article{van_meter_dose-finding_2012,
@@ -268,6 +385,7 @@ CONCLUSION: We conclude LEN can be administered safely post-allograft in conjunc
 
 @article{norris_precautionary_2017,
 	title = {Precautionary {Coherence} {Unravels} {Dose} {Escalation} {Designs}},
+	url = {https://www.biorxiv.org/content/10.1101/240846v1},
 	doi = {10.1101/240846},
 	abstract = {Background Coherence notions have a long history in statistics, as rhetorical devices that support the critical examination of statistical doctrines and practices. Within the special domain of dose-finding methodology, a widely-discussed coherence criterion has been advanced as a means to guard the conceptual integrity of formal dose-finding designs from ad hoc tinkering. This is not, however, the only possible coherence criterion relevant to dose finding. Indeed, a new coherence criterion emerges naturally when the near-universal practice of cohort-wise dose escalation is examined from a clinical perspective.Methods The practice of enrolling drug-naive patients into an escalation cohort is considered from a realistic perspective that acknowledges patients’ heterogeneity with respect to pharmacokinetics and pharmacodynamics. A new coherence criterion thereby emerges, requiring that an escalation dose be tried preferentially in participants who have already tolerated a lower dose, rather than in new enrollees who are drug-naive. The logical implications of this ‘precautionary coherence’ (PC) criterion are worked out in the setting of a 3+3 design. A ‘3+3/PC’ design that satisfies this criterion is described and visualized. A simulation study is performed, evaluating the long-run performance of this new design, relative to optimal 1-size-fits-all dosing.Results Under the PC criterion, the 3+3 dose-escalation design necessarily transmutes into a dose titration design. Two simple rules suffice to enable abandonment of low starting doses, and termination of escalation. The process of conducting the 3+3/PC trial itself models the application of a dose titration algorithm (DTA) that carries over readily into clinical care. The 3+3/PC trial also yields an interval-censored ‘dose-survival curve’ having a semantics that should prove familiar to oncology trialists. Simulated 3+3/PC trials yield DTAs over a median of 6 dose levels, achieving 50\% improved population-level efficacy compared to optimal 1-size-fits-all dosing.Conclusions Dose individualization can be accomplished within a trial conducted along ‘algorithmic’ lines resembling those of the inveterate 3+3 design. The dose-survival curve arising from this ‘3+3/PC’ design has semantics that should prove familiar and conceptually accessible to oncology trialists, and also seems capable of supporting more formal statistical treatments of the design. In the presence of sufficient heterogeneity in individualized optimal dosing, a 3+3/PC trial outperforms any conceivable 1-size-fits-all dose-finding design. This fact eliminates the rationale for the latter designs, and should put an end to the further development and promulgation of 1-size-fits-all dose finding.},
 	journal = {bioRxiv},
@@ -321,7 +439,7 @@ CONCLUSION: We conclude LEN can be administered safely post-allograft in conjunc
 	journal = {Journal of Statistical Software},
 	author = {Sabanés Bové, Daniel and Yeung, Wai Yin and Palermo, Giuseppe and Jaki, Thomas},
 	year = {2019},
-	file = {example.pdf:/Users/david/zotero/storage/CS33X84W/example.pdf:application/pdf;Sabanés Bové et al. - 2019 - Model-Based Dose Escalation Designs in R wi.pdf:/Users/david/zotero/storage/MDBUV6VC/Sabanés Bové et al. - 2019 - Model-Based Dose Escalation Designs in R wi.pdf:application/pdf}
+	file = {crmPack-intro-vignette.pdf:/Users/david/zotero/storage/CX55VXLN/crmPack-intro-vignette.pdf:application/pdf;example.pdf:/Users/david/zotero/storage/CS33X84W/example.pdf:application/pdf;Sabanés Bové et al. - 2019 - Model-Based Dose Escalation Designs in R wi.pdf:/Users/david/zotero/storage/MDBUV6VC/Sabanés Bové et al. - 2019 - Model-Based Dose Escalation Designs in R wi.pdf:application/pdf}
 }
 
 @article{braun_simulationfree_2020,
@@ -393,4 +511,121 @@ CONCLUSION: We conclude LEN can be administered safely post-allograft in conjunc
 	note = {arXiv: 2012.05301},
 	keywords = {Statistics - Methodology, Statistics - Applications, Quantitative Biology - Quantitative Methods},
 	file = {arXiv Fulltext PDF:/Users/david/zotero/storage/TTMKDVAD/Norris - 2020 - What Were They Thinking Pharmacologic priors impl.pdf:application/pdf;arXiv.org Snapshot:/Users/david/zotero/storage/36V5MGM3/2012.html:text/html}
+}
+
+@article{infante_phase_2014,
+	title = {Phase {I} dose-escalation study of {LCL161}, an oral inhibitor of apoptosis proteins inhibitor, in patients with advanced solid tumors},
+	volume = {32},
+	issn = {1527-7755},
+	doi = {10.1200/JCO.2013.52.3993},
+	abstract = {PURPOSE: LCL161 antagonizes the function of inhibitor of apoptosis proteins (IAPs), thereby promoting cancer cell death. This first-in-human dose-escalation study assessed the maximum-tolerated dose (MTD), safety, pharmacokinetics, and pharmacodynamics of LCL161 in patients with advanced solid tumors. A second part of the study assessed the relative bioavailability of a tablet versus solution formulation.
+PATIENTS AND METHODS: LCL161 was administered orally, once weekly, on a 21-day cycle to adult patients with advanced solid tumors by using an adaptive Bayesian logistic regression model with overdose control-guided dose escalation.
+RESULTS: Fifty-three patients received at least one dose of LCL161 (dose range, 10 to 3,000 mg). LCL161 was well tolerated at doses up to 1,800 mg. Cytokine release syndrome (CRS) was the only dose-limiting toxicity (in three [6\%] of 53 patients) and was the most common grades 3 to 4 event (in five [9\%] of 53 patients). Vomiting, nausea, asthenia/fatigue, and anorexia were common but not severe. Although the MTD was not formally determined, an 1,800-mg dose was selected in compliance with the protocol for additional study, given the dose-limiting CRS at higher doses and pharmacodynamic activity at lower doses. LCL161 was rapidly absorbed, and exposure was generally increased with dose. The tablet formulation of LCL161 was better tolerated than the solution; tablet and solution formulations had similar exposures, and the solution was discontinued. No patient had an objective response. LCL161 induced degradation of cellular IAP1 protein in the blood, skin, and tumor and increased circulating cytokine levels.
+CONCLUSION: The 1,800-mg dose of LCL161, administered as a single agent once weekly, in tablet formulation is the recommended dose for additional study. This combined dose and formulation was well tolerated and had significant pharmacodynamic activity, which warrants additional investigation.},
+	language = {eng},
+	number = {28},
+	journal = {Journal of Clinical Oncology: Official Journal of the American Society of Clinical Oncology},
+	author = {Infante, Jeffrey R. and Dees, E. Claire and Olszanski, Anthony J. and Dhuria, Shyeilla V. and Sen, Suman and Cameron, Scott and Cohen, Roger B.},
+	month = oct,
+	year = {2014},
+	pmid = {25113756},
+	keywords = {Administration, Oral, Adult, Aged, Aged, 80 and over, Antineoplastic Agents, Area Under Curve, Biological Availability, Cytokines, Diarrhea, Dose-Response Relationship, Drug, Drug Administration Schedule, Female, Humans, Inhibitor of Apoptosis Proteins, Male, Middle Aged, Nausea, Neoplasms, Pharmaceutical Solutions, Syndrome, Tablets, Thiazoles, Treatment Outcome, Vomiting},
+	pages = {3103--3110},
+	file = {Infante et al. - 2014 - Phase I dose-escalation study of LCL161, an oral i.pdf:/Users/david/zotero/storage/8MWX4FEZ/Infante et al. - 2014 - Phase I dose-escalation study of LCL161, an oral i.pdf:application/pdf}
+}
+
+@article{lee_calibration_2011,
+	title = {Calibration of prior variance in the {Bayesian} continual reassessment method},
+	volume = {30},
+	issn = {1097-0258},
+	doi = {10.1002/sim.4139},
+	abstract = {The continual reassessment method (CRM) is an adaptive model-based design used to estimate the maximum tolerated dose in phase I clinical trials. Asymptotically, the method has been shown to select the correct dose given that certain conditions are satisfied. When sample size is small, specifying a reasonable model is important. While an algorithm has been proposed for the calibration of the initial guesses of the probabilities of toxicity, the calibration of the prior distribution of the parameter for the Bayesian CRM has not been addressed. In this paper, we introduce the concept of least informative prior variance for a normal prior distribution. We also propose two systematic approaches to jointly calibrate the prior variance and the initial guesses of the probability of toxicity at each dose. The proposed calibration approaches are compared with existing approaches in the context of two examples via simulations. The new approaches and the previously proposed methods yield very similar results since the latter used appropriate vague priors. However, the new approaches yield a smaller interval of toxicity probabilities in which a neighboring dose may be selected.},
+	language = {eng},
+	number = {17},
+	journal = {Statistics in Medicine},
+	author = {Lee, Shing M. and Cheung, Ying Kuen},
+	month = jul,
+	year = {2011},
+	pmid = {21413054},
+	pmcid = {PMC3129459},
+	keywords = {Algorithms, Antineoplastic Agents, Dose-Response Relationship, Drug, Models, Statistical, Bayes Theorem, Humans, Computer Simulation, Clinical Trials, Phase I as Topic, Maximum Tolerated Dose, Pyrazines, Boronic Acids, Bortezomib, Lymphoma, B-Cell},
+	pages = {2081--2089},
+	file = {Accepted Version:/Users/david/zotero/storage/492ME253/Lee and Cheung - 2011 - Calibration of prior variance in the Bayesian cont.pdf:application/pdf;Lee and Cheung - 2011 - Calibration of prior variance in the Bayesian cont.pdf:/Users/david/zotero/storage/V5GLLYLQ/Lee and Cheung - 2011 - Calibration of prior variance in the Bayesian cont.pdf:application/pdf}
+}
+
+@article{lee_model_2009,
+	title = {Model calibration in the continual reassessment method},
+	volume = {6},
+	issn = {1740-7745},
+	doi = {10.1177/1740774509105076},
+	abstract = {BACKGROUND: The continual reassessment method (CRM) is an adaptive model-based design used to estimate the maximum tolerated dose in dose finding clinical trials. A way to evaluate the sensitivity of a given CRM model including the functional form of the dose-toxicity curve, the prior distribution on the model parameter, and the initial guesses of toxicity probability at each dose is using indifference intervals. While the indifference interval technique provides a succinct summary of model sensitivity, there are infinitely many possible ways to specify the initial guesses of toxicity probability. In practice, these are generally specified by trial and error through extensive simulations.
+METHODS: By using indifference intervals, the initial guesses used in the CRM can be selected by specifying a range of acceptable toxicity probabilities in addition to the target probability of toxicity. An algorithm is proposed for obtaining the indifference interval that maximizes the average percentage of correct selection across a set of scenarios of true probabilities of toxicity and providing a systematic approach for selecting initial guesses in a much less time-consuming manner than the trial-and-error method. The methods are compared in the context of two real CRM trials.
+RESULTS: For both trials, the initial guesses selected by the proposed algorithm had similar operating characteristics as measured by percentage of correct selection, average absolute difference between the true probability of the dose selected and the target probability of toxicity, percentage treated at each dose and overall percentage of toxicity compared to the initial guesses used during the conduct of the trials which were obtained by trial and error through a time-consuming calibration process. The average percentage of correct selection for the scenarios considered were 61.5 and 62.0\% in the lymphoma trial, and 62.9 and 64.0\% in the stroke trial for the trial-and-error method versus the proposed approach.
+LIMITATIONS: We only present detailed results for the empiric dose toxicity curve, although the proposed methods are applicable for other dose-toxicity models such as the logistic.
+CONCLUSIONS: The proposed method provides a fast and systematic approach for selecting initial guesses of probabilities of toxicity used in the CRM that are competitive to those obtained by trial and error through a time-consuming process, thus, simplifying the model calibration process for the CRM.},
+	language = {eng},
+	number = {3},
+	journal = {Clinical Trials (London, England)},
+	author = {Lee, Shing M. and Cheung, Ying Kuen},
+	month = jun,
+	year = {2009},
+	pmid = {19528132},
+	pmcid = {PMC2884971},
+	keywords = {Algorithms, Dose-Response Relationship, Drug, Pharmaceutical Preparations, Clinical Trials as Topic, Humans, Models, Theoretical, Drug-Related Side Effects and Adverse Reactions, Calibration},
+	pages = {227--238},
+	file = {Lee and Cheung - 2009 - Model calibration in the continual reassessment me.pdf:/Users/david/zotero/storage/872K68H8/Lee and Cheung - 2009 - Model calibration in the continual reassessment me.pdf:application/pdf}
+}
+
+@article{chevret_continual_1993,
+	title = {The continual reassessment method in cancer phase {I} clinical trials: a simulation study},
+	volume = {12},
+	issn = {0277-6715},
+	shorttitle = {The continual reassessment method in cancer phase {I} clinical trials},
+	doi = {10.1002/sim.4780121201},
+	abstract = {In cancer studies, the aim of phase I clinical trials is to identify an appropriate dose for experimentation in phase II and III studies. The continual reassessment method (CRM) has been developed recently and presented as the method of choice in the design and analysis of such phase I studies. However, to implement the method, some methodological and practical considerations must be addressed. This paper examines, through a simulation study, the sensitivity of CRM both to the initial modelling of the dose-toxicity relationship and the prior. It appears that the performance of CRM can be improved by using vague priors and initial tuning of the model to allow flexibility.},
+	language = {eng},
+	number = {12},
+	journal = {Statistics in Medicine},
+	author = {Chevret, S.},
+	month = jun,
+	year = {1993},
+	pmid = {8210815},
+	keywords = {Antineoplastic Agents, Dose-Response Relationship, Drug, Neoplasms, Logistic Models, Models, Statistical, Monte Carlo Method, Sensitivity and Specificity, Research Design, Bayes Theorem, Humans, Clinical Trials, Phase I as Topic, Bias, Ethics, Medical, Evaluation Studies as Topic, Organizational Objectives},
+	pages = {1093--1108},
+	file = {Chevret - 1993 - The continual reassessment method in cancer phase .pdf:/Users/david/zotero/storage/KM2UERTH/Chevret - 1993 - The continual reassessment method in cancer phase .pdf:application/pdf}
+}
+
+@article{cheung_simple_2002,
+	title = {A simple technique to evaluate model sensitivity in the continual reassessment method},
+	volume = {58},
+	issn = {0006-341X},
+	doi = {10.1111/j.0006-341x.2002.00671.x},
+	abstract = {The continual reassessment method (CRM) is a sequential design used in phase I cancer trials to determine the maximal dose with acceptable toxicity. It has been established that the CRM is consistent under model misspecification but not generally. When the method does not converge to the target percentile, some dose-response models will be more sensitive than others in terms of how close the converged recommendation is to the target. In this article, we interpret the main condition under which the CRM is consistent and apply it to evaluate the sensitivity of the model used with the CRM. The technique presented is found to be a useful supplement to simulation when planning a phase I trial.},
+	language = {eng},
+	number = {3},
+	journal = {Biometrics},
+	author = {Cheung, Ying Kuen and Chappell, Rick},
+	month = sep,
+	year = {2002},
+	pmid = {12230003},
+	keywords = {Antineoplastic Agents, Neoplasms, Models, Statistical, Sensitivity and Specificity, Biometry, Humans, Clinical Trials, Phase I as Topic, Drug Tolerance},
+	pages = {671--674},
+	file = {Cheung and Chappell - 2002 - A simple technique to evaluate model sensitivity i.pdf:/Users/david/zotero/storage/IQD5WC4C/Cheung and Chappell - 2002 - A simple technique to evaluate model sensitivity i.pdf:application/pdf}
+}
+
+@article{ivanova_cumulative_2007,
+	title = {Cumulative cohort design for dose-finding},
+	volume = {137},
+	issn = {0378-3758},
+	url = {https://www.sciencedirect.com/science/article/pii/S0378375806002461},
+	doi = {10.1016/j.jspi.2006.07.009},
+	abstract = {We introduce a new design for dose-finding in the context of toxicity studies for which it is assumed that toxicity increases with dose. The goal is to identify the maximum tolerated dose, which is taken to be the dose associated with a prespecified “target” toxicity rate. The decision to decrease, increase or repeat a dose for the next subject depends on how far an estimated toxicity rate at the current dose is from the target. The size of the window within which the current dose will be repeated is obtained based on the theory of Markov chains as applied to group up-and-down designs. But whereas the treatment allocation rule in Markovian group up-and-down designs is only based on information from the current cohort of subjects, the treatment allocation rule for the proposed design is based on the cumulative information at the current dose. We then consider an extension of this new design for clinical trials in which the subject's outcome is not known immediately. The new design is compared to the continual reassessment method.},
+	number = {7},
+	journal = {Journal of Statistical Planning and Inference},
+	author = {Ivanova, Anastasia and Flournoy, Nancy and Chung, Yeonseung},
+	month = jul,
+	year = {2007},
+	keywords = {Maximum tolerated dose, Phase I clinical trials, Continual reassessment method, Delayed responses, Group up-and-down designs, Markov chains, Non-parametric designs, Toxicity studies},
+	pages = {2316--2327},
+	file = {Ivanova et al. - 2007 - Cumulative cohort design for dose-finding.pdf:/Users/david/zotero/storage/34998TFE/Ivanova et al. - 2007 - Cumulative cohort design for dose-finding.pdf:application/pdf}
 }
